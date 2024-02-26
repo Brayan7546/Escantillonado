@@ -1,0 +1,28 @@
+{% extends './base.html' %}
+{% include './navbar.html' %}
+
+{% block customCSS %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/general.css')}}">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid vh-100">
+    <div class="row h-100">
+        <div id="ListaCalculos" class="col-3 p-4 d-flex flex-column align-items-start">
+            <button id="addCalculation" class="btn btn-success">Añadir cálculo</button>
+            <table class="table custom-table" id="calculationsTable" class="table mt-4">
+                <tbody>
+                    <!-- Las filas se añadirán dinámicamente aquí -->
+                </tbody>
+            </table>
+        </div>
+        <div class="col-9" id="calculationDisplay" style="background-color: #f0f0f0;">
+            <div class="container" style="background-color: aqua;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/general.js') }}"></script>
+{% endblock %}
