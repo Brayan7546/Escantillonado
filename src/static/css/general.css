@@ -15,7 +15,7 @@
   }
   
 body {
-    margin-top: 66px;
+    margin-top: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,7 +27,9 @@ body {
 
 #ListaCalculos{
     background-color: white; 
-    box-shadow: 0px 0px 10px black;
+    box-shadow: 0px 0px 10px #aaa;
+    position: relative;
+  z-index: 100;
 }
 
 .custom-table {
@@ -62,14 +64,18 @@ border: none;
 outline: none;
 }
 
-.custom-rounded {
+.rounded {
     border-radius: 15px !important;
 }
 
 label {
     text-align: left!important;
 }
-        
+    
+#calculationDisplay{
+  background-color: #f0f0f0;
+  overflow-y: visible;
+}
 
 
 
