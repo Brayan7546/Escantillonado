@@ -6,6 +6,47 @@ document.addEventListener('DOMContentLoaded', function () {
     let isAddingNewCalculation = false;
     let currentSamplingZone = '';
     let lastInteractedField = null;
+    var dataAcron = [
+        { acronym: 'Kar', label: 'Factor de reducción de la presión del área' },
+        { acronym: 'Kl', label: 'Factor de distribución longitudinal de presión' },
+        { acronym: 'Kdc', label: 'Factor de categoría de diseño' },
+        { acronym: 'Kz', label: 'Factor de distribución vertical de presión' },
+        { acronym: 'Ksup', label: 'Factor de reducción de presión de la superestructura' },
+        { acronym: 'Hb', label: 'Altura de la columna de agua' },
+        { acronym: 'b', label: 'Dimensión más corta del panel de la lámina' },
+        { acronym: 'l', label: 'Dimensión más larga del panel de la lámina' },
+        { acronym: 'c', label: 'Corona o curvatura del panel' },
+        { acronym: 'k2', label: 'Factor de relación de aspecto del panel para la resistencia a la flexión' },
+        { acronym: 'x', label: 'Distancia desde la popa de la línea de flotación hasta el centro del panel o refuerzo' },
+        { acronym: 'Kc', label: 'Factor de corrección de curvatura para el chapado' },
+        { acronym: 'Sigma u', label: 'Esfuerzo último a la tracción' },
+        { acronym: 'sigma y', label: 'Esfuerzo de fluencia a la tracción' },
+        { acronym: 'sigma d', label: 'Esfuerzo de diseño' },
+        { acronym: 'T final', label: 'Espesor mínimo requerido' },
+        { acronym: 'sigma uf', label: 'Esfuerzo último a la flexión' },
+        { acronym: 'sigma ut', label: 'Esfuerzo último a la tracción de la fibra externa' },
+        { acronym: 'sigma uc', label: 'Esfuerzo último a la compresión de la fibra interna' },
+        { acronym: 'eio', label: 'Promedio de los módulos de Young de las fibras internas y externas' },
+        { acronym: 'tau u', label: 'Esfuerzo último al cortante del núcleo' },
+        { acronym: 'k3', label: 'Factor de relación de aspecto del panel para la resistencia a la flexión' },
+        { acronym: 'sigma dt', label: 'Esfuerzo de tracción de diseño de la fibra exterior' },
+        { acronym: 'sigma dc', label: 'Esfuerzo de compresión de diseño de la fibra interior' },
+        { acronym: 'tau d', label: 'Esfuerzo cortante de diseño del núcleo' },
+        { acronym: 'sm inner', label: 'Módulo de sección mínimo requerido de la cara exterior de 1cm de ancho' },
+        { acronym: 'sm outter', label: 'Módulo de sección mínimo requerido de la cara interior de 1cm de ancho' },
+        { acronym: 'second I', label: 'Segundo momento de inercia mínimo requerido para una cara de 1 cm de ancho' },
+        { acronym: 'wos', label: 'Masa de fibra mínima requerida de la fibra exterior' },
+        { acronym: 'wis', label: 'Masa de fibra mínima requerida de la fibra interior' },
+        { acronym: 's', label: 'Separación entre refuerzos' },
+        { acronym: 'cu', label: 'Corona o curvatura' },
+        { acronym: 'ksa', label: 'Factor de área del cortante' },
+        { acronym: 'lu', label: 'Longitud no soportada del refuerzo' },
+        { acronym: 'SM', label: 'Módulo de sección mínimo requerido' },
+        { acronym: 'tau', label: 'Resistencia al cortante mínima' },
+        { acronym: 'sigma ct', label: 'Esfuerzo último' },
+        { acronym: 'I', label: 'Segundo momento de área mínimo requerido' },
+        { acronym: 'AW', label: 'Área del alma mínima requerida' },
+        ];
     loadUserCalculations(); 
     const { jsPDF } = window.jspdf;
 
@@ -69,14 +110,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const doc = new jsPDF();
         const imageUrl = 'static/img/Fondo pdf.png'; 
-    
-        // Calcula la mitad de la página
-        const middleOfPageX = doc.internal.pageSize.getWidth() / 2;
-        const middleOfPageY = doc.internal.pageSize.getHeight() / 2;
+
 
         // Encabezado con información general en la primera página
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(18);  // Ajusta el tamaño de la fuente
+        doc.setFontSize(16);  // Ajusta el tamaño de la fuente
         doc.setTextColor(85, 115, 89);
 
         // Texto a alinear en el centro
@@ -84,33 +122,38 @@ document.addEventListener('DOMContentLoaded', function () {
         const doneByText = `Realizado por: ${generalData.doneBy || ''}`;
         const dateText = `Fecha: ${generalData.date || ''}`;
 
-        // Calcula la posición x para centrar el texto
-        const shipNameTextWidth = doc.getTextWidth(shipNameText) / 2;
-        const doneByTextWidth = doc.getTextWidth(doneByText) / 2;
-        const dateTextWidth = doc.getTextWidth(dateText) / 2;
+        const startY = 30;
 
-        // Calcula la posición y para centrar el bloque de texto
-        const blockHeight = 18 * 3; // Aproximadamente 3 líneas de altura, ajusta según sea necesario
-        const startY = middleOfPageY - blockHeight / 2;
-
-        doc.text(shipNameText, middleOfPageX - shipNameTextWidth, startY);
-        doc.text(doneByText, middleOfPageX - doneByTextWidth, startY + 18); // Suma 18 para la siguiente línea, ajusta según sea necesario
-        doc.text(dateText, middleOfPageX - dateTextWidth, startY + 36); // Suma 36 para la tercera línea
-
-        // Asegúrate de agregar la imagen de fondo si es necesario
         doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
-        
+        doc.text(shipNameText, 14, startY);
+        doc.text(doneByText, 14, startY + 10);
+        doc.text(dateText, 14, startY + 20); 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);  
         doc.setTextColor(85, 115, 89);
 
+        doc.text("Información Especifica", 14, startY + 30);
+        doc.autoTable({
+            head: [['Acrónimo', 'Descripción']],
+            body: dataAcron.map(item => [item.acronym, item.label]),
+            startY: startY + 34,
+                headStyles: {
+                    fillColor: [85, 115, 89]  // RGB equivalent of #557359
+                }, styles: {
+                    cellPadding: 1, // Reduce el relleno de las celdas para que la tabla sea más compacta
+                }, margin: { bottom: 30, top: 30 }
+          }); 
+          doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);      
+
         doc.addPage();
     
         // Recorremos cada ID seleccionado
-        selectedIds.forEach(id => {
+        selectedIds.forEach((id, index) => {
+            if (index > 0) {
+                doc.addPage();
+            }
             const data = tempFormData[id];
             const resultados = data.resultados;
-            const pressureData = resultados.pressure;
             const type = (data.V / Math.sqrt(data.LWL)) < 5 ? 'Displacement' : 'Planning';
             doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
 
@@ -143,142 +186,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let currentY = doc.lastAutoTable.finalY + 8;
 
-            let pressureDetails = resultados.pressure.PSUP_M_values;
-            let kSUP_values = resultados.pressure.kSUP_values;
+            const pressureData = resultados.pressure;
 
-            let pressureRows = [];
+            // Tabla de presión
+            let pressureTableHead;
+            let pressureTableBody = [];
+            
             if (data.samplingZone === 'Superestructura') {
+                pressureTableHead = [['Ubicación', 'KAR', 'KDC', 'KSUP', 'Presión']];
+                const pressureDetails = resultados.pressure.PSUP_M_values;
+                const kSUP_values = resultados.pressure.kSUP_values;
+            
                 for (const location in pressureDetails) {
-                    pressureRows.push(["Ubicación", "Ubicación", location, ""]);
-                    pressureRows.push(["KAR", "Factor de reducción de la presión del área", resultados.pressure.kAR.toFixed(5), ""]);
-                    pressureRows.push(["KDC", "Factor de categoría de diseño", resultados.pressure.kDC.toFixed(5), ""]);
-                    pressureRows.push(["KSUP", "Factor de reducción de presión de la superestructura", kSUP_values[location].toFixed(5), ""]);
-                    pressureRows.push(["Presión", "Presión", pressureDetails[location].toFixed(5), "MPa"]);
+                    pressureTableBody.push([
+                        location,
+                        resultados.pressure.kAR.toFixed(5),
+                        resultados.pressure.kDC.toFixed(5),
+                        kSUP_values[location].toFixed(5),
+                        `${pressureDetails[location].toFixed(5)} MPa` // Unidad concatenada directamente al valor
+                    ]);
                 }
             } else {
-                Object.entries(resultados.pressure).forEach(([key, value]) => {
-                    let label = "";
-                    let unit = "";
-                    switch(key) {
-                        case "kAR": label = "Factor de reducción de la presión del área"; break;
-                        case "kDC": label = "Factor de categoría de diseño"; break;
-                        case "kL": label = "Factor de distribución longitudinal de presión"; break;
-                        case "kZ": label = "Factor de distribución vertical de presión"; break;
-                        case "kSUP": label = "Factor de reducción de presión de la superestructura"; break;
-                        case "HB": label = "Altura de la columna de agua"; unit = "m"; break;
-                        case "Pressure": label = "Presión"; unit = "MPa"; break; 
-                        default: label = key;
+                // Lógica para otras zonas de escantillonado
+                pressureTableHead = [['Sección', 'Valor', 'Unidad']];
+                pressureTableBody = Object.entries(pressureData).map(([key, value]) => {
+                    let unit = '';
+                    if (key === 'Pressure') {
+                        unit = 'MPa';  // Asumiendo que la unidad para presión es MPa
                     }
-                    pressureRows.push([key, label, typeof value === 'number' ? value.toFixed(5) : value, unit]);
+                    
+                    return [key, typeof value === 'number' ? value.toFixed(5) : value, unit];
                 });
             }
-
-            let pressureTableHead = [['Símbolo', 'Descripción', 'Valor', 'Unidad']];
-            let pressureTableBody = pressureRows;
-
-
 
             // Tabla de plating o stiffeners
             let platingStiffenersHead = [];
             let platingStiffenersBody = [];
-            
-            function formatValue(value) {
-                const num = parseFloat(value);
-                return Math.abs(num) < 0.00001 ? num.toExponential(3) : num.toFixed(5);
-            }
-
-            function createPlatingStiffenersRow(symbol, description, value, unit) {
-                return [symbol, description, value, unit];
-            }
-            
-            let platingStiffenersRows = [];
 
             if (data.analysisType === 'Plating') {
                 switch (data.material) {
                     case 'Acero':
-                        case 'Aluminio':
-                            if (data.samplingZone === 'Superestructura' && (data.material === 'Acero' || data.material === 'Aluminio')) {
-                                
-                                Object.entries(resultados).forEach(([location, result]) => {
-                                    if (location !== 'pressure') {
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('b', 'Dimensión más corta del panel de la lámina', data.b, 'mm'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('l', 'Dimensión más larga del panel de la lámina', data.l, 'mm'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('k2', 'Factor de relación de aspecto del panel para la resistencia a la flexión', result.k2.toFixed(5), ''));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('x', 'Distancia desde la popa de la línea de flotación hasta el centro del panel o refuerzo', data.x, 'm'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('c', 'Corona o curvatura del panel', data.c, 'mm'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('kc', 'Factor de corrección de curvatura para el chapado', result.kC.toFixed(5), ''));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('Sigma u', 'Esfuerzo último a la tracción', data.sigmaU, 'MPa'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('Sigma y', 'Esfuerzo de fluencia a la tracción', data.sigmaY, 'MPa'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('Sigma d', 'Esfuerzo de diseño', result.sigmaD.toFixed(5), 'MPa'));
-                                        platingStiffenersRows.push(createPlatingStiffenersRow('T final', 'Espesor mínimo requerido', result.thickness.toFixed(5), 'mm'));
-                                        
-                                    }
-                                });
-                            } else {
-                                platingStiffenersRows.push(createPlatingStiffenersRow('b', 'Dimensión más corta del panel de la lámina', data.b, 'mm'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('l', 'Dimensión más larga del panel de la lámina', data.l, 'mm'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('k2', 'Factor de relación de aspecto del panel para la resistencia a la flexión', resultados.k2.toFixed(5), ''));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('x', 'Distancia desde la popa de la línea de flotación hasta el centro del panel o refuerzo', data.x, 'm'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('c', 'Corona o curvatura del panel', data.c, 'mm'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('kc', 'Factor de corrección de curvatura para el chapado', resultados.kC.toFixed(5), ''));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('Sigma u', 'Esfuerzo último a la tracción', data.sigmaU, 'MPa'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('Sigma y', 'Esfuerzo de fluencia a la tracción', data.sigmaY, 'MPa'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('Sigma d', 'Esfuerzo de diseño', resultados.sigmaD.toFixed(5), 'MPa'));
-                                platingStiffenersRows.push(createPlatingStiffenersRow('T final', 'Espesor mínimo requerido', resultados.thickness.toFixed(5), 'mm'));
-                            }
-                            break;
-                    case 'Madera (laminada y plywood)':
-                        if (data.samplingZone === 'Superestructura') {
-                            platingStiffenersHead = [['Ubicación', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'Sigma Uf (MPa)', 'Sigma D (MPa)', 'Wmin (mm)', 'Tfinal (mm)']];
+                    case 'Aluminio':
+                        if (data.samplingZone === 'Superestructura' && (data.material === 'Acero' || data.material === 'Aluminio')) {
+                            platingStiffenersHead = [['Location', 'b', 'l', 'c', 'x', 'k2', 'kc',  'sigma uf',  'sigma d', 'Tfinal']];
+                        
                             Object.entries(resultados).forEach(([location, result]) => {
-                                if (location !== 'pressure') {
+                                if (location !== 'pressure') { 
                                     platingStiffenersBody.push([
                                         location,
                                         data.b,
                                         data.l,
-                                        result.k2.toFixed(5),
-                                        data.x,
-                                        data.sigmaUf,
-                                        result.sigmaD.toFixed(5),
-                                        result.wMin ? result.wMin.toFixed(5) : 'N/A',
-                                        result.thickness.toFixed(5)
-                                    ]);
-                                }
-                            });
-                        } else {
-                            platingStiffenersHead = [['Property', 'Value']];
-                            platingStiffenersBody = [
-                                ['b (mm)', data.b],
-                                ['l (mm)', data.l],
-                                ['k2', resultados.k2.toFixed(5)],
-                                ['x (m)', data.x],
-                                ['Sigma uf (MPa)', data.sigmaUf],
-                                ['Sigma d (MPa)', resultados.sigmaD.toFixed(5)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(5)]
-                            ];
-                        }
-                        break;
-                    case 'Fibra laminada':
-                        if (data.samplingZone === 'Superestructura') {
-                            platingStiffenersHead = [['Location', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'c (mm)', 'kc', 'Sigma uf (MPa)', 'Sigma d (MPa)', 'Wmin (mm)', 'Tfinal (mm)']];
-                            Object.entries(resultados).forEach(([location, result]) => {
-                                if (location !== 'pressure') { // Excluimos el objeto de presión
-                                    platingStiffenersBody.push([
-                                        location,
-                                        data.b,
-                                        data.l,
-                                        result.k2.toFixed(5),
-                                        data.x,
                                         data.c,
+                                        data.x,
+                                        result.k2.toFixed(5),
                                         result.kC.toFixed(5),
                                         data.sigmaUf,
                                         result.sigmaD.toFixed(5),
-                                        result.wMin ? result.wMin.toFixed(5) : 'N/A',
-                                        result.thickness.toFixed(5)
+                                        result.thickness.toFixed(5),
                                     ]);
                                 }
                             });
+                        
                         } else {
                             platingStiffenersHead = [['Property', 'Value']];
                             platingStiffenersBody = [
@@ -288,79 +256,133 @@ document.addEventListener('DOMContentLoaded', function () {
                                 ['x (m)', data.x],
                                 ['c (mm)', data.c],
                                 ['kc', resultados.kC.toFixed(5)],
-                                ['Sigma uf (MPa)', data.sigmaUf],
+                                ['Sigma u (MPa)', data.sigmaU],
+                                ['Sigma y (MPa)', data.sigmaY],
                                 ['Sigma d (MPa)', resultados.sigmaD.toFixed(5)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(5)]
+                                ['tfinal (mm)', resultados.thickness.toFixed(5)]
+                            ];
+                        }
+                        break;
+                    case 'Madera (laminada y plywood)':
+                        if (data.samplingZone === 'Superestructura') {
+                            platingStiffenersHead = [['Ubicación', 'b', 'l', 'k2', 'x', 'Sigma Uf', 'Sigma D', 'Tfinal']];
+                            Object.entries(resultados).forEach(([location, result]) => {
+                                if (location !== 'pressure') {
+                                    platingStiffenersBody.push([
+                                        location,
+                                        data.b + ' mm',
+                                        data.l + ' mm',
+                                        result.k2.toFixed(5),
+                                        data.x + ' m',
+                                        data.sigmaUf + ' MPa',
+                                        result.sigmaD.toFixed(5) + ' MPa',
+                                        result.thickness.toFixed(5) + ' mm'
+                                    ]);
+                                }
+                            });
+                        } else {
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
+                            platingStiffenersBody = [
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k2', resultados.k2.toFixed(5), ''],
+                                ['x', data.x, 'm'],
+                                ['Sigma uf', data.sigmaUf, 'MPa'],
+                                ['Sigma d', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['Tfinal', resultados.thickness.toFixed(5), 'mm']
+                            ];
+                        }
+                        break; 
+                    case 'Fibra laminada':
+                        if (data.samplingZone === 'Superestructura') {
+                            platingStiffenersHead = [['Ubicación', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'c (mm)', 'kc', 'Sigma uf', 'Sigma d', 'Tfinal']];
+                            Object.entries(resultados).forEach(([location, result]) => {
+                                if (location !== 'pressure') { // Excluimos el objeto de presión
+                                    platingStiffenersBody.push([
+                                        location,
+                                        `${data.b} mm`,
+                                        `${data.l} mm`,
+                                        result.k2.toFixed(5),
+                                        `${data.x} m`,
+                                        `${data.c} mm`,
+                                        result.kC.toFixed(5),
+                                        `${data.sigmaUf} MPa`,
+                                        `${result.sigmaD.toFixed(5)} MPa`,
+                                        `${result.thickness.toFixed(5)} mm`
+                                    ]);
+                                }
+                            });
+                        } else {
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
+                            platingStiffenersBody = [
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k2', resultados.k2.toFixed(5), ''],
+                                ['x', data.x, 'm'],
+                                ['c', data.c, 'mm'],
+                                ['kc', resultados.kC.toFixed(5), ''],
+                                ['Sigma uf', data.sigmaUf, 'MPa'],
+                                ['Sigma d', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['Tfinal', resultados.thickness.toFixed(5), 'mm']
                             ];
                         }
                         break;
                     case 'Fibra con nucleo (Sandwich)':
-                        const optionalRows = [
-                            { label: 'Wos', key: 'wos' },
-                            { label: 'Wis', key: 'wis' },
-                            { label: 'Wmin', key: 'wMin' }
-                        ];
                         if (data.samplingZone === 'Superestructura') {
-                            // Extraer las zonas de la superestructura
-                            const zones = Object.keys(resultados).filter(zone => zone !== 'pressure');
-                            
-                            // Crear el encabezado con las zonas
-                            platingStiffenersHead = [['Property', ...zones]];
-                    
-                            // Función para agregar filas a la tabla
-                            const addRow = (label, func) => [label, ...zones.map(zone => func(resultados[zone]))];
-                    
-                            // Construir el cuerpo de la tabla
-                            platingStiffenersBody = [
-                                addRow('b (mm)', () => data.b),
-                                addRow('l (mm)', () => data.l),
-                                addRow('k1', result => result.k1.toFixed(3)),
-                                addRow('k2', result => result.k2.toFixed(3)),
-                                addRow('k3', result => result.k3.toFixed(3)),
-                                addRow('x (m)', () => data.x),
-                                addRow('c (mm)', () => data.c),
-                                addRow('kc', result => result.KC.toFixed(3)),
-                                addRow('Sigma UT (MPa)', () => data.sigmaUt),
-                                addRow('Sigma UC (MPa)', () => data.sigmaUc),
-                                addRow('Eio (MPa)', () => data.eio),
-                                addRow('Tau U', () => data.tauU),
-                                addRow('kSHC', result => result.kSHC.toFixed(3)),
-                                addRow('Tfinal (mm)', result => result.thickness.toFixed(3)),
-                                addRow('Sigma DT', result => result.sigma_dt.toFixed(3)),
-                                addRow('Sigma DC', result => result.sigma_dc.toFixed(3)),
-                                addRow('Tau D', result => result.tau_d.toFixed(3)),
-                                addRow('SM Inner', result => result.SM_inner.toFixed(6)),
-                                addRow('SM Outter', result => result.SM_outter.toFixed(6)),
-                                addRow('Second I', result => result.second_I.toExponential(3)),
-                            ];
-                            
+                            platingStiffenersHead = [['Ubicación', 'b', 'l', 'k1', 'k2', 'k3', 'x', 'c', 'kc', 'Sigma UT', 'Sigma UC', 'Eio', 'Tau U', 'kSHC', 'Tfinal', 'Sigma DT', 'Sigma DC', 'Tau D', 'SM Inner', 'SM Outter', 'Second I', 'Wos', 'Wis']];
+                            Object.keys(resultados).filter(zone => zone !== 'pressure').forEach(zone => {
+                                let result = resultados[zone];
+                                platingStiffenersBody.push([
+                                    zone,
+                                    `${data.b} mm`,
+                                    `${data.l} mm`,
+                                    result.k1.toFixed(3),
+                                    result.k2.toFixed(3),
+                                    result.k3.toFixed(3),
+                                    `${data.x} m`,
+                                    `${data.c} mm`,
+                                    result.KC.toFixed(3),
+                                    `${data.sigmaUt} MPa`,
+                                    `${data.sigmaUc} MPa`,
+                                    `${data.eio} MPa`,
+                                    `${data.tauU} MPa`,
+                                    result.kSHC.toFixed(3),
+                                    `${result.thickness.toFixed(3)} mm`,
+                                    `${result.sigma_dt.toFixed(3)} MPa`,
+                                    `${result.sigma_dc.toFixed(3)} MPa`,
+                                    `${result.tau_d.toFixed(3)} MPa`,
+                                    `${result.SM_inner.toFixed(6)} mm³`,
+                                    `${result.SM_outter.toFixed(6)} mm³`,
+                                    `${result.second_I.toExponential(3)} mm⁴`,
+                                    result.wos ? `${result.wos.toFixed(5)} g/m²` : 'N/A',
+                                    result.wis ? `${result.wis.toFixed(5)} g/m²` : 'N/A'
+                                ]);
+                            });
                         } else {
-                            platingStiffenersHead = [['Propiedad', 'Valor']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['b (mm)', data.b],
-                                ['l (mm)', data.l],
-                                ['k2', resultados.k2.toFixed(3)],
-                                ['x (m)', data.x],
-                                ['c (mm)', data.c],
-                                ['kc', resultados.KC.toFixed(3)],
-                                ['Sigma UT (MPa)', data.sigmaUt],
-                                ['Sigma UC (MPa)', data.sigmaUc],
-                                ['Eio (MPa)', data.eio],
-                                ['Tau U', data.tauU],
-                                ['k3', resultados.k3.toFixed(3)],
-                                ['k1', resultados.k1.toFixed(3)],
-                                ['kSHC', resultados.kSHC.toFixed(3)],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(3)],
-                                ['Sigma DT', resultados.sigma_dt.toFixed(3)],
-                                ['Sigma DC', resultados.sigma_dc.toFixed(3)],
-                                ['Tau D', resultados.tau_d.toFixed(3)],
-                                ['SM Inner', resultados.SM_inner.toFixed(6)],
-                                ['SM Outter', resultados.SM_outter.toFixed(6)],
-                                ['Second I', resultados.second_I.toExponential(3)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['wos (mm)', resultados.wos ? resultados.wos.toFixed(5) : 'N/A'],
-                                ['wis (mm)', resultados.wis ? resultados.wis.toFixed(5) : 'N/A'],
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k1', resultados.k1.toFixed(3), ''],
+                                ['k2', resultados.k2.toFixed(3), ''],
+                                ['k3', resultados.k3.toFixed(3), ''],
+                                ['x', data.x, 'm'],
+                                ['c', data.c, 'mm'],
+                                ['kc', resultados.KC.toFixed(3), ''],
+                                ['Sigma UT', data.sigmaUt, 'MPa'],
+                                ['Sigma UC', data.sigmaUc, 'MPa'],
+                                ['Eio', data.eio, 'MPa'],
+                                ['Tau U', data.tauU, 'MPa'],
+                                ['kSHC', resultados.kSHC.toFixed(3), ''],
+                                ['Tfinal', resultados.thickness.toFixed(3), 'mm'],
+                                ['Sigma DT', resultados.sigma_dt.toFixed(3), 'MPa'],
+                                ['Sigma DC', resultados.sigma_dc.toFixed(3), 'MPa'],
+                                ['Tau D', resultados.tau_d.toFixed(3), 'MPa'],
+                                ['SM Inner', resultados.SM_inner.toFixed(6), 'mm³'],
+                                ['SM Outter', resultados.SM_outter.toFixed(6), 'mm³'],
+                                ['Second I', resultados.second_I.toExponential(3), 'mm⁴'],
+                                ['Wos', resultados.wos ? resultados.wos.toFixed(5) : 'N/A', 'g/m²'],
+                                ['Wis', resultados.wis ? resultados.wis.toFixed(5) : 'N/A', 'g/m²']
                             ];
                         }
                         break;
@@ -370,114 +392,116 @@ document.addEventListener('DOMContentLoaded', function () {
                     case 'Acero':
                     case 'Aluminio':
                         if (data.samplingZone === 'Superestructura') {
-                            // Extraer las zonas de la superestructura
-                            const zones = Object.keys(resultados.resultsAW);
-                
-                            // Crear el encabezado con las zonas
-                            platingStiffenersHead = [['Property', ...zones]];
-                
-                            // Función para agregar filas a la tabla
-                            const addRow = (label, func) => [label, ...zones.map(zone => func(resultados, zone))];
-                
-                            // Construir el cuerpo de la tabla
+                            // Define el encabezado de la tabla
+                            platingStiffenersHead = [['Ubicación', 's', 'lu', 'cu', 'x', 'KSA', 'sigma y', 'sigma d', 'tau d', 'SM', 'AW']];
+                        
+                            // Itera sobre los resultados para construir el cuerpo de la tabla
+                            Object.entries(resultados.resultsAW).forEach(([location, awValue]) => {
+                                let smValue = resultados.SM[location];
+                                let sigmaD = resultados.sigmaD;
+                                let tauD = resultados.tauD;
+                                let kSA = resultados.kSA;
+                        
+                                // Asumiendo que `data.s`, `data.lu`, `data.cu`, `data.x` son valores globales
+                                platingStiffenersBody.push([
+                                    location,  // Ubicación
+                                    data.s,  // s
+                                    data.lu, // lu
+                                    data.cu, // cu
+                                    data.x,  // x
+                                    kSA.toFixed(5),     // KSA
+                                    data.sigmaY,  // sigma y
+                                    sigmaD.toFixed(5),  // sigma d
+                                    tauD.toFixed(5),    // tau d
+                                    smValue.toFixed(5), // SM
+                                    awValue.toFixed(5)  // AW
+                                ]);
+                            });
+                        
+                            // Combina el encabezado y el cuerpo para crear la tabla completa
+                            let platingStiffenersTable = [platingStiffenersHead, ...platingStiffenersBody];
+                        }
+                         else {
+                            // Casos para Aluminio fuera de Superestructura
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                addRow('s', () => parseFloat(data.s).toFixed(5)),
-                                addRow('cu', () => parseFloat(data.cu).toFixed(5)),
-                                addRow('kSA', () => parseFloat(resultados.kSA).toFixed(5)),
-                                addRow('lu', () => parseFloat(data.lu).toFixed(5)),
-                                addRow('x (m)', () => parseFloat(data.x).toFixed(5)),
-                                addRow('Sigma Y (MPa)', () => parseFloat(data.sigmaY).toFixed(5)),
-                                addRow('Sigma D (MPa)', () => parseFloat(resultados.sigmaD).toFixed(5)),
-                                addRow('Tau D (MPa)', () => parseFloat(resultados.tauD).toFixed(5)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone]).toFixed(5)),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone]).toFixed(5))
-                            ];
-                        } else {
-                            // Casos para Acero y Aluminio fuera de Superestructura
-                            platingStiffenersHead = [['Property', 'Value']];
-                            platingStiffenersBody = [
-                                ['S', data.s],
-                                ['Cu', data.cu],
-                                ['kSA', resultados.kSA],
-                                ['Lu', data.lu],
-                                ['X', data.x],
-                                ['Sigma Y (MPa)', data.sigmaY],
-                                ['Sigma D (MPa)', resultados.sigmaD],
-                                ['Tau D', resultados.tauD],
-                                ['AW', resultados.AW],
-                                ['SM', resultados.SM]
+                                ['S', data.s, ''],
+                                ['Cu', data.cu, ''],
+                                ['kSA', resultados.kSA, ''],
+                                ['Lu', data.lu, 'm'],
+                                ['X', data.x, 'm'],
+                                ['Sigma Y', data.sigmaY, 'MPa'],
+                                ['Sigma D', resultados.sigmaD, 'MPa'],
+                                ['Tau D', resultados.tauD, 'MPa'],
+                                ['AW', resultados.AW, ''],
+                                ['SM', resultados.SM, 'mm³']
                             ];
                         }
-
-                        break;
+                        break;                        
                     case 'Madera (laminada y plywood)':
                         if (data.samplingZone === 'Superestructura') {
                             const zones = Object.keys(resultados.resultsAW); // Asumiendo que 'resultsAW' contiene las zonas para superestructura
-                            platingStiffenersHead = [['Property', ...zones]];
+                            platingStiffenersHead = [['Ubicación', ...zones.map(zone => zone + ' (mm)')]]; // Ajustar si se necesita unidad en el encabezado
                     
-                            const addRow = (label, func) => {
-                                return [label, ...zones.map(zone => {
-                                    const value = func(resultados, zone);
-                                    // Verificar si el valor está en notación científica o es demasiado pequeño
-                                    return Math.abs(value) < 0.00001 ? value.toExponential(3) : value.toFixed(5);
-                                })];
+                            // Función para agregar filas a la tabla
+                            const addRow = (label, unit, func) => {
+                                return zones.map(zone => [zone, label, func(resultados, zone) + unit]);
                             };
                     
+                            // Construir el cuerpo de la tabla
                             platingStiffenersBody = [
-                                addRow('Tau', () => parseFloat(data.tau)),
-                                addRow('Tau D', () => parseFloat(resultados.tauD)),
-                                addRow('Sigma UF', () => parseFloat(data.sigmaUf)),
-                                addRow('Sigma D', () => parseFloat(resultados.sigmaD)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone])),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone]))
+                                ...addRow('Tau', '', () => parseFloat(data.tau)),
+                                ...addRow('Tau D', ' MPa', () => parseFloat(resultados.tauD)),
+                                ...addRow('Sigma UF', ' MPa', () => parseFloat(data.sigmaUf)),
+                                ...addRow('Sigma D', ' MPa', () => parseFloat(resultados.sigmaD)),
+                                ...addRow('AW', '', (res, zone) => parseFloat(res.resultsAW[zone])),
+                                ...addRow('SM', ' mm³', (res, zone) => parseFloat(res.SM[zone]))
                             ];
                         } else {
-                            // Para otras zonas que no son superestructura
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['Tau', formatValue(data.tau)],
-                                ['Tau D', formatValue(resultados.tauD)],
-                                ['Sigma UF', formatValue(data.sigmaUf)],
-                                ['Sigma D', formatValue(resultados.sigmaD)],
-                                ['AW', formatValue(resultados.AW)],
-                                ['SM', formatValue(resultados.SM)]
+                                ['Tau', data.tau.toFixed(5), ''],
+                                ['Tau D', resultados.tauD.toFixed(5), 'MPa'],
+                                ['Sigma UF', data.sigmaUf.toFixed(5), 'MPa'],
+                                ['Sigma D', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['AW', resultados.AW.toFixed(5), ''],
+                                ['SM', resultados.SM.toFixed(5), 'mm³']
                             ];
                         }
                         break;
                     case 'Fibra laminada':
                         if (data.samplingZone === 'Superestructura') {
                             const zones = Object.keys(resultados.resultsAW); // Asumiendo que 'resultsAW' contiene las zonas para superestructura
-                            platingStiffenersHead = [['Property', ...zones]];
+                            platingStiffenersHead = [['Ubicación', ...zones.map(zone => zone + ' (mm)')]]; // Ajustar si se necesita unidad en el encabezado
                     
-                            const addRow = (label, func) => {
-                                return [label, ...zones.map(zone => {
-                                    const value = func(resultados, zone);
-                                    return Math.abs(value) < 0.00001 ? value.toExponential(3) : value.toFixed(5);
-                                })];
+                            // Función para agregar filas a la tabla
+                            const addRow = (label, unit, func) => {
+                                return zones.map(zone => [zone, label, func(resultados, zone) + unit]);
                             };
                     
+                            // Construir el cuerpo de la tabla
                             platingStiffenersBody = [
-                                addRow('Tau', () => parseFloat(data.tau)),
-                                addRow('Tau D', () => parseFloat(resultados.tauD)),
-                                addRow('Sigma CT', () => parseFloat(data.sigmaCt)),
-                                addRow('Sigma D', () => parseFloat(resultados.sigmaD)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone])),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone])),
-                                addRow('SM,I', (res, zone) => parseFloat(res.SM[zone])) // Asumiendo SM,I es similar a SM
+                                ...addRow('Tau', '', () => parseFloat(data.tau)),
+                                ...addRow('Tau D', ' MPa', () => parseFloat(resultados.tauD)),
+                                ...addRow('Sigma CT', ' MPa', () => parseFloat(data.sigmaCt)),
+                                ...addRow('Sigma D', ' MPa', () => parseFloat(resultados.sigmaD)),
+                                ...addRow('AW', '', (res, zone) => parseFloat(res.resultsAW[zone])),
+                                ...addRow('SM', ' mm³', (res, zone) => parseFloat(res.SM[zone])),
+                                ...addRow('SM,I', ' mm³', (res, zone) => parseFloat(res.SM[zone])) // Asumiendo SM,I es similar a SM
                             ];
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['Tau', formatValue(data.tau)],
-                                ['Tau D', formatValue(resultados.tauD)],
-                                ['Sigma CT', formatValue(data.sigmaCt)],
-                                ['Sigma D', formatValue(resultados.sigmaD)],
-                                ['AW', formatValue(resultados.AW)],
-                                ['SM', formatValue(resultados.SM)],
-                                ['I', formatValue(resultados.I)] // Asumiendo SM,I es similar a SM
+                                ['Tau', data.tau.toFixed(5), ''],
+                                ['Tau D', resultados.tauD.toFixed(5), 'MPa'],
+                                ['Sigma CT', data.sigmaCt.toFixed(5), 'MPa'],
+                                ['Sigma D', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['AW', resultados.AW.toFixed(5), ''],
+                                ['SM', resultados.SM.toFixed(5), 'mm³'],
+                                ['I', resultados.I.toFixed(5), 'mm⁴'] // Asumiendo SM,I es similar a SM
                             ];
                         }
-                        break;
+                        break;                        
                 }
                 
             }
@@ -497,6 +521,10 @@ document.addEventListener('DOMContentLoaded', function () {
     
             currentY = doc.lastAutoTable.finalY + 8;
     
+            // Determinar el ancho de la columna de ubicación basado en el número total de columnas
+            let totalColumns = platingStiffenersHead[0].length;
+            let locationColumnWidth = totalColumns > 5 ? 40 : 30; // Aumentar el ancho si hay muchas columnas
+
             // Agregar la tabla de plating o stiffeners
             doc.text(data.analysisType === 'Plating' ? "Plating" : "Stiffeners", 14, currentY);
             currentY += 3;
@@ -505,18 +533,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: platingStiffenersBody,
                 startY: currentY,
                 headStyles: {
-                    fillColor: [85, 115, 89]  // Color verde oscuro para el encabezado
+                    fillColor: [85, 115, 89] // Color verde oscuro para el encabezado
+                },
+                styles: {
+                    cellPadding: 1, 
                 },
                 columnStyles: {
-                    0: { cellWidth: 30 }  // Ajusta según sea necesario
+                    0: { cellWidth: locationColumnWidth } // Usa la variable para el ancho
                 },
-                margin: { bottom: 30, top: 30 }, styles: {
-                    cellPadding: 1, 
-                }  
+                margin: { bottom: 30, top: 30 } // Ajusta el margen inferior a 35
             });
+
             doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
-    
-            doc.addPage();
     
         });
         
@@ -579,9 +607,6 @@ document.addEventListener('DOMContentLoaded', function () {
             z : getValueOrDefault('deckHeight',0,'z'),
             hp : getValueOrDefault('panelCenterHeight',0,'hp'),
             hB: getValueOrDefault('columnHeight',0,'hB'),
-            hM: getValueOrDefault('alturaMamparo',0,'hM'),
-            bM: getValueOrDefault('baseMamparo',0,'bM'),
-            pA: getValueOrDefault('perforationArea',0,'pA'),
             hs: getValueOrDefault('stiffenerCenterHeight',0,'ns'),
             etc: getValueOrDefault('modulusEtc', 0, 'etc'),
             tau: getValueOrDefault('tau', 0, 'tau'),
@@ -615,26 +640,35 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     function loadTempFormData(calculationId) {
-        console.log(calculationId)
+        temporaryFormData = JSON.parse(localStorage.getItem('temporaryFormData')) || {};
         let data = temporaryFormData[calculationId];
-    
+
         if (!data) {
             const keys = Object.keys(temporaryFormData);
-            if (keys.length > 0) {
+            if (keys.length > 0) { 
                 const lastCalculationId = keys[keys.length - 1];
                 data = {...temporaryFormData[lastCalculationId]};
-                data.designCategory = 'Seleccione una opción';
-                data.material = 'Seleccione una opción';
-                data.samplingZone = 'Seleccione una opción';
-                data.analysisType = 'Seleccione una opción';
-                data.fiberType = 'Seleccione una opción';
-                data.exteriorFiberType = 'Seleccione una opción';
-                data.interiorFiberType = 'Seleccione una opción';
-                data.sandwichCoreType = 'Seleccione una opción';
-            }
+            } else { data = {} };
+
+
+            data.designCategory = 'Seleccione una opción';
+            data.material = 'Seleccione una opción';
+            data.samplingZone = 'Seleccione una opción';
+            data.analysisType = 'Seleccione una opción';
+            data.fiberType = 'Seleccione una opción';
+            data.exteriorFiberType = 'Seleccione una opción';
+            data.interiorFiberType = 'Seleccione una opción';
+            data.sandwichCoreType = 'Seleccione una opción';
+            data.LH = data.LH ?? 0;
+            data.LWL = data.LWL ?? 0;
+            data.BWL = data.BWL ?? 0;
+            data.BC = data.BC ?? 0;
+            data.V = data.V ?? 0;
+            data.mLDC = data.mLDC ?? 0;
+            data.B04 = data.B04 ?? 0;
         }
-    
-        
+
+
         if (data) {
             document.getElementById('designCategory').value = data.designCategory || '';
             document.getElementById('material').value = data.material || '';
@@ -655,7 +689,6 @@ document.addEventListener('DOMContentLoaded', function () {
             currentSamplingZone = data.samplingZone || 'Seleccione una opción';
             updateImage();
         }
-        
     }
 
     let originalCalculationId = null;
@@ -663,11 +696,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function selectRow(newRow) {
         document.querySelectorAll('#calculationsTable tbody tr').forEach(row => {
             row.classList.remove('selected-row');
-        });
+        });    
     
         newRow.classList.add('selected-row');
-    
-    
         selectedRow = newRow;
         currentCalculationRow = newRow;
         originalCalculationId = newRow.cells[1].textContent;
@@ -766,7 +797,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <option>Superestructura</option>
                             <option>Mamparos estancos</option>
                             <option>Mamparos de tanques integrales</option>
-                            <option>Placas anti oleaje</option>
                             <option>Mamparos de colisión</option>
                         </select>
                     </div>
@@ -830,12 +860,11 @@ document.addEventListener('DOMContentLoaded', function () {
         newCalculationContainer.style.boxShadow = '0px 0px 10px #aaa';
         newCalculationContainer.style.minHeight = '200px';
         displayArea.style.overflowY = 'auto'; 
-        displayArea.style.maxHeight = '90vh'; 
+        displayArea.style.maxHeight = '91vh'; 
         
         newCalculationContainer.innerHTML = formHtml;
         displayArea.appendChild(newCalculationContainer);
         
-
         setupFormInteractions();
 
         const samplingZoneSelect = document.getElementById('samplingZone');
@@ -884,7 +913,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'Mamparos estancos':
             case 'Mamparos de tanques integrales':
-            case 'Placas anti oleaje':
             case 'Mamparos de colisión':
                 defaultImage = 'MAMPAROS.png';
                 break;
@@ -1086,11 +1114,11 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteCell.innerHTML = deleteButtonHTML;
         deleteCell.classList.add("delete-cell");
         
-        saveTempFormData(newCalculationId);
-        
         selectRow(newRow);
     
         attachFormSubmitListener(); 
+
+        saveTempFormData(newCalculationId);
     
         newRow.addEventListener('click', function(e) {
             if (!e.target.classList.contains('btn-delete')) {0.
@@ -1167,15 +1195,32 @@ document.addEventListener('DOMContentLoaded', function () {
         if (form) {
             form.addEventListener('submit', function(event) {
                 event.preventDefault(); // Previene el envío del formulario
-                
-                // Aquí colocas la lógica para guardar los datos del formulario
-                //saveCalculation();
     
-                // Aquí llamas a la función que carga el segundo formulario
-                loadSecondForm();
+                // Verificar cada campo de selección
+                const selectElements = form.querySelectorAll('select');
+                let isFormValid = true;
+    
+                selectElements.forEach(select => {
+                    // Verificar si el elemento select está visible
+                    if (!select.closest('.form-group').classList.contains('d-none')) {
+                        console.log(select.TEXT_NODE,select.value)
+                        if (select.value === 'Seleccione una opción') {
+                            select.setCustomValidity('Debe seleccionar una opción');
+                            select.reportValidity();
+                            isFormValid = false;
+                        } else {
+                            select.setCustomValidity(''); // Limpiar mensajes de error previos
+                        }
+                    }
+                });
+    
+                if (isFormValid) {
+                    loadSecondForm();
+                }
             });
         }
     }
+    
 
     function loadSecondForm() {
         const analysisType = document.getElementById('analysisType').value;
@@ -1211,6 +1256,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const calculationId = selectedRow.cells[1].textContent;
                     const calculationData = temporaryFormData[calculationId];
                     displayCalculationForm(calculationData,null,calculationId);
+                    selectRow(selectedRow);
                     attachFormSubmitListener(); 
                 }
             });
@@ -1229,7 +1275,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 let allDataAvailable = true;
                 let missingDataMessage = '';
             
-                
                 if (
                     data.resultados === null ||
                     typeof data.resultados === 'undefined' ||
@@ -1248,7 +1293,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-            
                 if (!allDataAvailable) {
                     Swal.fire({
                         title: 'Error',
@@ -1258,88 +1302,90 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 } 
 
+            const doc = new jsPDF();
+            const type = (data.V / Math.sqrt(data.LWL)) < 5 ? 'Displacement' : 'Planning';
+            const imageUrl = 'static/img/Fondo pdf.png'; // Ajusta esto a la ruta real o URL/base64
+            doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
+            let infoRows = [
+                ["Cat. Diseño", "Categoría de diseño", data.designCategory, ""],
+                ["Material", "Material de escantillonado", data.material, ""],
+                ["Tipo", "Tipo de embarcación", type, ""],
+                ["Zona", "Zona de escantillonado", data.samplingZone, ""],
+                ["LH", "Eslora del casco", data.LH, "m"],
+                ["LWL", "Eslora en línea de flotación", data.LWL, "m"],
+                ["BWL", "Manga en línea de flotación", data.BWL, "m"],
+                ["BC", "Manga entre pantoques", data.BC, "m"],
+                ["V", "Velocidad máxima de diseño", data.V, "nudos"],
+                ["mLDC", "Desplazamiento de la embarcación", data.mLDC, "kg"],
+                ["B04", "Astilla muerta de fondo", data.B04, "grados"]
+            ];
+                
+            // Configura los encabezados de la tabla
+            let generalTableHead = [['Acron', 'Descripción', 'Valor', 'Unidad']];
+            
+            // Usa 'infoRows' como el cuerpo de la tabla
+            let generalTableBody = infoRows;                
 
-                const doc = new jsPDF();
-                const type = (data.V / Math.sqrt(data.LWL)) < 5 ? 'Displacement' : 'Planning';
-                const imageUrl = 'static/img/Fondo pdf.png'; // Ajusta esto a la ruta real o URL/base64
-                doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
-                let infoRows = [
-                    ["Cat. Diseño", "Categoría de diseño", data.designCategory, ""],
-                    ["Material", "Material de escantillonado", data.material, ""],
-                    ["Tipo", "Tipo de embarcación", type, ""],
-                    ["Zona", "Zona de escantillonado", data.samplingZone, ""],
-                    ["LH", "Eslora del casco", data.LH, "m"],
-                    ["LWL", "Eslora en línea de flotación", data.LWL, "m"],
-                    ["BWL", "Manga en línea de flotación", data.BWL, "m"],
-                    ["BC", "Manga entre pantoques", data.BC, "m"],
-                    ["V", "Velocidad máxima de diseño", data.V, "nudos"],
-                    ["mLDC", "Desplazamiento de la embarcación", data.mLDC, "kg"],
-                    ["B04", "Astilla muerta de fondo", data.B04, "grados"]
-                ];
-                
-                // Configura los encabezados de la tabla
-                let generalTableHead = [['Acron', 'Descripción', 'Valor', 'Unidad']];
-                
-                // Usa 'infoRows' como el cuerpo de la tabla
-                let generalTableBody = infoRows;                
-
-                // Tabla de presión
-                let pressureTableHead;
-                let pressureTableBody = [];
-                
-                if (data.samplingZone === 'Superestructura') {
-                    pressureTableHead = [['Ubicación', 'KAR', 'KDC', 'KSUP', 'Presión']];
-                    const pressureDetails = resultados.pressure.PSUP_M_values;
-                    const kSUP_values = resultados.pressure.kSUP_values;
-                
-                    for (const location in pressureDetails) {
-                        pressureTableBody.push([
-                            location,
-                            resultados.pressure.kAR.toFixed(5),
-                            resultados.pressure.kDC.toFixed(5),
-                            kSUP_values[location].toFixed(5),
-                            pressureDetails[location].toFixed(5)
-                        ]);
-                    }
-                } else {
-                    // Lógica para otras zonas de escantillonado
-                    pressureTableHead = [['Section', 'Value']];
-                    pressureTableBody = Object.entries(pressureData).map(([key, value]) => {
-                        return [key, typeof value === 'number' ? value.toFixed(5) : value];
-                    });
+            // Tabla de presión
+            let pressureTableHead;
+            let pressureTableBody = [];
+            
+            if (data.samplingZone === 'Superestructura') {
+                // Añadir la columna "Unidad" en el encabezado
+                pressureTableHead = [['Ubicación', 'KAR', 'KDC', 'KSUP', 'Presión', 'Unidad']];
+                const pressureDetails = resultados.pressure.PSUP_M_values;
+                const kSUP_values = resultados.pressure.kSUP_values;
+            
+                for (const location in pressureDetails) {
+                    pressureTableBody.push([
+                        location,
+                        resultados.pressure.kAR.toFixed(5),
+                        resultados.pressure.kDC.toFixed(5),
+                        kSUP_values[location].toFixed(5),
+                        pressureDetails[location].toFixed(5),
+                        'MPa'  
+                    ]);
                 }
-                
+            } else {
+                pressureTableHead = [['Sección', 'Valor', 'Unidad']];
+                pressureTableBody = Object.entries(pressureData).map(([key, value]) => {
+                    let unit = '';
+                    if (key === 'Pressure') {
+                        unit = 'MPa';  // Asumiendo que la unidad para presión es MPa
+                    }
+                    return [key, typeof value === 'number' ? value.toFixed(5) : value, unit];
+                });
+            }
         
             // Tabla de plating o stiffeners
             let platingStiffenersHead = [];
             let platingStiffenersBody = [];
-            
-            function formatValue(value) {
-                const num = parseFloat(value);
-                return Math.abs(num) < 0.00001 ? num.toExponential(3) : num.toFixed(5);
-            }
 
             if (data.analysisType === 'Plating') {
                 switch (data.material) {
                     case 'Acero':
                     case 'Aluminio':
                         if (data.samplingZone === 'Superestructura' && (data.material === 'Acero' || data.material === 'Aluminio')) {
-                            platingStiffenersHead = [['Location', 'k2', 'kc', 'Thickness (mm)', 'Sigma D (MPa)']];
+                            platingStiffenersHead = [['Location', 'b', 'l', 'c', 'x', 'k2', 'kc',  'sigma uf',  'sigma d', 'Tfinal']];
                         
                             Object.entries(resultados).forEach(([location, result]) => {
                                 if (location !== 'pressure') { 
                                     platingStiffenersBody.push([
                                         location,
+                                        data.b,
+                                        data.l,
+                                        data.c,
+                                        data.x,
                                         result.k2.toFixed(5),
                                         result.kC.toFixed(5),
+                                        data.sigmaUf,
+                                        result.sigmaD.toFixed(5),
                                         result.thickness.toFixed(5),
-                                        result.sigmaD.toFixed(5)
                                     ]);
                                 }
                             });
                         
                         } else {
-                            // Casos para otros materiales y zonas que no son superestructura
                             platingStiffenersHead = [['Property', 'Value']];
                             platingStiffenersBody = [
                                 ['b (mm)', data.b],
@@ -1351,145 +1397,130 @@ document.addEventListener('DOMContentLoaded', function () {
                                 ['Sigma u (MPa)', data.sigmaU],
                                 ['Sigma y (MPa)', data.sigmaY],
                                 ['Sigma d (MPa)', resultados.sigmaD.toFixed(5)],
-                                ['tmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
                                 ['tfinal (mm)', resultados.thickness.toFixed(5)]
                             ];
                         }
                         break;
                     case 'Madera (laminada y plywood)':
                         if (data.samplingZone === 'Superestructura') {
-                            platingStiffenersHead = [['Ubicación', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'Sigma Uf (MPa)', 'Sigma D (MPa)', 'Wmin (mm)', 'Tfinal (mm)']];
+                            platingStiffenersHead = [['Ubicación', 'b', 'l', 'k2', 'x', 'Sigma Uf', 'Sigma D', 'Tfinal']];
                             Object.entries(resultados).forEach(([location, result]) => {
                                 if (location !== 'pressure') {
                                     platingStiffenersBody.push([
                                         location,
-                                        data.b,
-                                        data.l,
+                                        data.b + ' mm',
+                                        data.l + ' mm',
                                         result.k2.toFixed(5),
-                                        data.x,
-                                        data.sigmaUf,
-                                        result.sigmaD.toFixed(5),
-                                        result.wMin ? result.wMin.toFixed(5) : 'N/A',
-                                        result.thickness.toFixed(5)
+                                        data.x + ' m',
+                                        data.sigmaUf + ' MPa',
+                                        result.sigmaD.toFixed(5) + ' MPa',
+                                        result.thickness.toFixed(5) + ' mm'
                                     ]);
                                 }
                             });
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['b (mm)', data.b],
-                                ['l (mm)', data.l],
-                                ['k2', resultados.k2.toFixed(5)],
-                                ['x (m)', data.x],
-                                ['Sigma uf (MPa)', data.sigmaUf],
-                                ['Sigma d (MPa)', resultados.sigmaD.toFixed(5)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(5)]
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k2', resultados.k2.toFixed(5), ''],
+                                ['x', data.x, 'm'],
+                                ['Sigma uf', data.sigmaUf, 'MPa'],
+                                ['Sigma d', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['Tfinal', resultados.thickness.toFixed(5), 'mm']
                             ];
                         }
-                        break;
+                        break; 
                     case 'Fibra laminada':
                         if (data.samplingZone === 'Superestructura') {
-                            platingStiffenersHead = [['Location', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'c (mm)', 'kc', 'Sigma uf (MPa)', 'Sigma d (MPa)', 'Wmin (mm)', 'Tfinal (mm)']];
+                            platingStiffenersHead = [['Ubicación', 'b (mm)', 'l (mm)', 'k2', 'x (m)', 'c (mm)', 'kc', 'Sigma uf', 'Sigma d', 'Tfinal']];
                             Object.entries(resultados).forEach(([location, result]) => {
                                 if (location !== 'pressure') { // Excluimos el objeto de presión
                                     platingStiffenersBody.push([
                                         location,
-                                        data.b,
-                                        data.l,
+                                        `${data.b} mm`,
+                                        `${data.l} mm`,
                                         result.k2.toFixed(5),
-                                        data.x,
-                                        data.c,
+                                        `${data.x} m`,
+                                        `${data.c} mm`,
                                         result.kC.toFixed(5),
-                                        data.sigmaUf,
-                                        result.sigmaD.toFixed(5),
-                                        result.wMin ? result.wMin.toFixed(5) : 'N/A',
-                                        result.thickness.toFixed(5)
+                                        `${data.sigmaUf} MPa`,
+                                        `${result.sigmaD.toFixed(5)} MPa`,
+                                        `${result.thickness.toFixed(5)} mm`
                                     ]);
                                 }
                             });
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['b (mm)', data.b],
-                                ['l (mm)', data.l],
-                                ['k2', resultados.k2.toFixed(5)],
-                                ['x (m)', data.x],
-                                ['c (mm)', data.c],
-                                ['kc', resultados.kC.toFixed(5)],
-                                ['Sigma uf (MPa)', data.sigmaUf],
-                                ['Sigma d (MPa)', resultados.sigmaD.toFixed(5)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(5)]
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k2', resultados.k2.toFixed(5), ''],
+                                ['x', data.x, 'm'],
+                                ['c', data.c, 'mm'],
+                                ['kc', resultados.kC.toFixed(5), ''],
+                                ['Sigma uf', data.sigmaUf, 'MPa'],
+                                ['Sigma d', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['Tfinal', resultados.thickness.toFixed(5), 'mm']
                             ];
                         }
                         break;
                     case 'Fibra con nucleo (Sandwich)':
-                        const optionalRows = [
-                            { label: 'Wos', key: 'wos' },
-                            { label: 'Wis', key: 'wis' },
-                            { label: 'Wmin', key: 'wMin' }
-                        ];
                         if (data.samplingZone === 'Superestructura') {
-                            // Extraer las zonas de la superestructura
-                            const zones = Object.keys(resultados).filter(zone => zone !== 'pressure');
-                            
-                            // Crear el encabezado con las zonas
-                            platingStiffenersHead = [['Property', ...zones]];
-                    
-                            // Función para agregar filas a la tabla
-                            const addRow = (label, func) => [label, ...zones.map(zone => func(resultados[zone]))];
-                    
-                            // Construir el cuerpo de la tabla
-                            platingStiffenersBody = [
-                                addRow('b (mm)', () => data.b),
-                                addRow('l (mm)', () => data.l),
-                                addRow('k1', result => result.k1.toFixed(3)),
-                                addRow('k2', result => result.k2.toFixed(3)),
-                                addRow('k3', result => result.k3.toFixed(3)),
-                                addRow('x (m)', () => data.x),
-                                addRow('c (mm)', () => data.c),
-                                addRow('kc', result => result.KC.toFixed(3)),
-                                addRow('Sigma UT (MPa)', () => data.sigmaUt),
-                                addRow('Sigma UC (MPa)', () => data.sigmaUc),
-                                addRow('Eio (MPa)', () => data.eio),
-                                addRow('Tau U', () => data.tauU),
-                                addRow('kSHC', result => result.kSHC.toFixed(3)),
-                                addRow('Tfinal (mm)', result => result.thickness.toFixed(3)),
-                                addRow('Sigma DT', result => result.sigma_dt.toFixed(3)),
-                                addRow('Sigma DC', result => result.sigma_dc.toFixed(3)),
-                                addRow('Tau D', result => result.tau_d.toFixed(3)),
-                                addRow('SM Inner', result => result.SM_inner.toFixed(6)),
-                                addRow('SM Outter', result => result.SM_outter.toFixed(6)),
-                                addRow('Second I', result => result.second_I.toExponential(3)),
-                            ];
-                            
+                            platingStiffenersHead = [['Ubicación', 'b', 'l', 'k1', 'k2', 'k3', 'x', 'c', 'kc', 'Sigma UT', 'Sigma UC', 'Eio', 'Tau U', 'kSHC', 'Tfinal', 'Sigma DT', 'Sigma DC', 'Tau D', 'SM Inner', 'SM Outter', 'Second I', 'Wos', 'Wis']];
+                            Object.keys(resultados).filter(zone => zone !== 'pressure').forEach(zone => {
+                                let result = resultados[zone];
+                                platingStiffenersBody.push([
+                                    zone,
+                                    `${data.b} mm`,
+                                    `${data.l} mm`,
+                                    result.k1.toFixed(3),
+                                    result.k2.toFixed(3),
+                                    result.k3.toFixed(3),
+                                    `${data.x} m`,
+                                    `${data.c} mm`,
+                                    result.KC.toFixed(3),
+                                    `${data.sigmaUt} MPa`,
+                                    `${data.sigmaUc} MPa`,
+                                    `${data.eio} MPa`,
+                                    `${data.tauU} MPa`,
+                                    result.kSHC.toFixed(3),
+                                    `${result.thickness.toFixed(3)} mm`,
+                                    `${result.sigma_dt.toFixed(3)} MPa`,
+                                    `${result.sigma_dc.toFixed(3)} MPa`,
+                                    `${result.tau_d.toFixed(3)} MPa`,
+                                    `${result.SM_inner.toFixed(6)} mm³`,
+                                    `${result.SM_outter.toFixed(6)} mm³`,
+                                    `${result.second_I.toExponential(3)} mm⁴`,
+                                    result.wos ? `${result.wos.toFixed(5)} g/m²` : 'N/A',
+                                    result.wis ? `${result.wis.toFixed(5)} g/m²` : 'N/A'
+                                ]);
+                            });
                         } else {
-                            platingStiffenersHead = [['Propiedad', 'Valor']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['b (mm)', data.b],
-                                ['l (mm)', data.l],
-                                ['k2', resultados.k2.toFixed(3)],
-                                ['x (m)', data.x],
-                                ['c (mm)', data.c],
-                                ['kc', resultados.KC.toFixed(3)],
-                                ['Sigma UT (MPa)', data.sigmaUt],
-                                ['Sigma UC (MPa)', data.sigmaUc],
-                                ['Eio (MPa)', data.eio],
-                                ['Tau U', data.tauU],
-                                ['k3', resultados.k3.toFixed(3)],
-                                ['k1', resultados.k1.toFixed(3)],
-                                ['kSHC', resultados.kSHC.toFixed(3)],
-                                ['Tfinal (mm)', resultados.thickness.toFixed(3)],
-                                ['Sigma DT', resultados.sigma_dt.toFixed(3)],
-                                ['Sigma DC', resultados.sigma_dc.toFixed(3)],
-                                ['Tau D', resultados.tau_d.toFixed(3)],
-                                ['SM Inner', resultados.SM_inner.toFixed(6)],
-                                ['SM Outter', resultados.SM_outter.toFixed(6)],
-                                ['Second I', resultados.second_I.toExponential(3)],
-                                ['Wmin (mm)', resultados.wMin ? resultados.wMin.toFixed(5) : 'N/A'],
-                                ['wos (mm)', resultados.wos ? resultados.wos.toFixed(5) : 'N/A'],
-                                ['wis (mm)', resultados.wis ? resultados.wis.toFixed(5) : 'N/A'],
+                                ['b', data.b, 'mm'],
+                                ['l', data.l, 'mm'],
+                                ['k1', resultados.k1.toFixed(3), ''],
+                                ['k2', resultados.k2.toFixed(3), ''],
+                                ['k3', resultados.k3.toFixed(3), ''],
+                                ['x', data.x, 'm'],
+                                ['c', data.c, 'mm'],
+                                ['kc', resultados.KC.toFixed(3), ''],
+                                ['Sigma UT', data.sigmaUt, 'MPa'],
+                                ['Sigma UC', data.sigmaUc, 'MPa'],
+                                ['Eio', data.eio, 'MPa'],
+                                ['Tau U', data.tauU, 'MPa'],
+                                ['kSHC', resultados.kSHC.toFixed(3), ''],
+                                ['Tfinal', resultados.thickness.toFixed(3), 'mm'],
+                                ['Sigma DT', resultados.sigma_dt.toFixed(3), 'MPa'],
+                                ['Sigma DC', resultados.sigma_dc.toFixed(3), 'MPa'],
+                                ['Tau D', resultados.tau_d.toFixed(3), 'MPa'],
+                                ['SM Inner', resultados.SM_inner.toFixed(6), 'mm³'],
+                                ['SM Outter', resultados.SM_outter.toFixed(6), 'mm³'],
+                                ['Second I', resultados.second_I.toExponential(3), 'mm⁴'],
+                                ['Wos', resultados.wos ? resultados.wos.toFixed(5) : 'N/A', 'g/m²'],
+                                ['Wis', resultados.wis ? resultados.wis.toFixed(5) : 'N/A', 'g/m²']
                             ];
                         }
                         break;
@@ -1501,124 +1532,170 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (data.samplingZone === 'Superestructura') {
                             // Extraer las zonas de la superestructura
                             const zones = Object.keys(resultados.resultsAW);
-                
+                    
                             // Crear el encabezado con las zonas
-                            platingStiffenersHead = [['Property', ...zones]];
-                
+                            platingStiffenersHead = [['Ubicación', ...zones.map(zone => zone + ' (mm)')]]; // Agregar unidad en el encabezado si es necesario
+                    
                             // Función para agregar filas a la tabla
-                            const addRow = (label, func) => [label, ...zones.map(zone => func(resultados, zone))];
-                
+                            const addRow = (label, unit, func) => {
+                                return zones.map(zone => [zone, label, func(resultados, zone) + unit]);
+                            };
+                    
                             // Construir el cuerpo de la tabla
                             platingStiffenersBody = [
-                                addRow('s', () => parseFloat(data.s).toFixed(5)),
-                                addRow('cu', () => parseFloat(data.cu).toFixed(5)),
-                                addRow('kSA', () => parseFloat(resultados.kSA).toFixed(5)),
-                                addRow('lu', () => parseFloat(data.lu).toFixed(5)),
-                                addRow('x (m)', () => parseFloat(data.x).toFixed(5)),
-                                addRow('Sigma Y (MPa)', () => parseFloat(data.sigmaY).toFixed(5)),
-                                addRow('Sigma D (MPa)', () => parseFloat(resultados.sigmaD).toFixed(5)),
-                                addRow('Tau D (MPa)', () => parseFloat(resultados.tauD).toFixed(5)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone]).toFixed(5)),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone]).toFixed(5))
+                                ...addRow('s', '', res => parseFloat(res.resultsAW.s).toFixed(5)),
+                                ...addRow('cu', '', res => parseFloat(res.resultsAW.cu).toFixed(5)),
+                                ...addRow('kSA', '', res => parseFloat(res.resultsAW.kSA).toFixed(5)),
+                                ...addRow('lu', ' m', res => parseFloat(res.resultsAW.lu).toFixed(5)),
+                                ...addRow('x', ' m', res => parseFloat(res.resultsAW.x).toFixed(5)),
+                                ...addRow('Sigma Y', ' MPa', res => parseFloat(res.resultsAW.sigmaY).toFixed(5)),
+                                ...addRow('Sigma D', ' MPa', res => parseFloat(res.resultsAW.sigmaD).toFixed(5)),
+                                ...addRow('Tau D', ' MPa', res => parseFloat(res.resultsAW.tauD).toFixed(5)),
+                                ...addRow('AW', '', res => parseFloat(res.resultsAW.AW).toFixed(5)),
+                                ...addRow('SM', ' mm³', res => parseFloat(res.resultsAW.SM).toFixed(5))
                             ];
                         } else {
-                            // Casos para Acero y Aluminio fuera de Superestructura
-                            platingStiffenersHead = [['Property', 'Value']];
+                            // Casos para Aluminio fuera de Superestructura
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['S', data.s],
-                                ['Cu', data.cu],
-                                ['kSA', resultados.kSA],
-                                ['Lu', data.lu],
-                                ['X', data.x],
-                                ['Sigma Y (MPa)', data.sigmaY],
-                                ['Sigma D (MPa)', resultados.sigmaD],
-                                ['Tau D', resultados.tauD],
-                                ['AW', resultados.AW],
-                                ['SM', resultados.SM]
+                                ['S', data.s, ''],
+                                ['Cu', data.cu, ''],
+                                ['kSA', resultados.kSA, ''],
+                                ['Lu', data.lu, 'm'],
+                                ['X', data.x, 'm'],
+                                ['Sigma Y', data.sigmaY, 'MPa'],
+                                ['Sigma D', resultados.sigmaD, 'MPa'],
+                                ['Tau D', resultados.tauD, 'MPa'],
+                                ['AW', resultados.AW, ''],
+                                ['SM', resultados.SM, 'mm³']
                             ];
                         }
-
-                        break;
+                        break;                        
                     case 'Madera (laminada y plywood)':
                         if (data.samplingZone === 'Superestructura') {
                             const zones = Object.keys(resultados.resultsAW); // Asumiendo que 'resultsAW' contiene las zonas para superestructura
-                            platingStiffenersHead = [['Property', ...zones]];
+                            platingStiffenersHead = [['Ubicación', ...zones.map(zone => zone + ' (mm)')]]; // Ajustar si se necesita unidad en el encabezado
                     
-                            const addRow = (label, func) => {
-                                return [label, ...zones.map(zone => {
-                                    const value = func(resultados, zone);
-                                    // Verificar si el valor está en notación científica o es demasiado pequeño
-                                    return Math.abs(value) < 0.00001 ? value.toExponential(3) : value.toFixed(5);
-                                })];
+                            // Función para agregar filas a la tabla
+                            const addRow = (label, unit, func) => {
+                                return zones.map(zone => [zone, label, func(resultados, zone) + unit]);
                             };
                     
+                            // Construir el cuerpo de la tabla
                             platingStiffenersBody = [
-                                addRow('Tau', () => parseFloat(data.tau)),
-                                addRow('Tau D', () => parseFloat(resultados.tauD)),
-                                addRow('Sigma UF', () => parseFloat(data.sigmaUf)),
-                                addRow('Sigma D', () => parseFloat(resultados.sigmaD)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone])),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone]))
+                                ...addRow('Tau', '', () => parseFloat(data.tau)),
+                                ...addRow('Tau D', ' MPa', () => parseFloat(resultados.tauD)),
+                                ...addRow('Sigma UF', ' MPa', () => parseFloat(data.sigmaUf)),
+                                ...addRow('Sigma D', ' MPa', () => parseFloat(resultados.sigmaD)),
+                                ...addRow('AW', '', (res, zone) => parseFloat(res.resultsAW[zone])),
+                                ...addRow('SM', ' mm³', (res, zone) => parseFloat(res.SM[zone]))
                             ];
                         } else {
-                            // Para otras zonas que no son superestructura
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['Tau', formatValue(data.tau)],
-                                ['Tau D', formatValue(resultados.tauD)],
-                                ['Sigma UF', formatValue(data.sigmaUf)],
-                                ['Sigma D', formatValue(resultados.sigmaD)],
-                                ['AW', formatValue(resultados.AW)],
-                                ['SM', formatValue(resultados.SM)]
+                                ['Tau', data.tau.toFixed(5), ''],
+                                ['Tau D', resultados.tauD.toFixed(5), 'MPa'],
+                                ['Sigma UF', data.sigmaUf.toFixed(5), 'MPa'],
+                                ['Sigma D', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['AW', resultados.AW.toFixed(5), ''],
+                                ['SM', resultados.SM.toFixed(5), 'mm³']
                             ];
                         }
                         break;
                     case 'Fibra laminada':
                         if (data.samplingZone === 'Superestructura') {
                             const zones = Object.keys(resultados.resultsAW); // Asumiendo que 'resultsAW' contiene las zonas para superestructura
-                            platingStiffenersHead = [['Property', ...zones]];
+                            platingStiffenersHead = [['Ubicación', ...zones.map(zone => zone + ' (mm)')]]; // Ajustar si se necesita unidad en el encabezado
                     
-                            const addRow = (label, func) => {
-                                return [label, ...zones.map(zone => {
-                                    const value = func(resultados, zone);
-                                    return Math.abs(value) < 0.00001 ? value.toExponential(3) : value.toFixed(5);
-                                })];
+                            // Función para agregar filas a la tabla
+                            const addRow = (label, unit, func) => {
+                                return zones.map(zone => [zone, label, func(resultados, zone) + unit]);
                             };
                     
+                            // Construir el cuerpo de la tabla
                             platingStiffenersBody = [
-                                addRow('Tau', () => parseFloat(data.tau)),
-                                addRow('Tau D', () => parseFloat(resultados.tauD)),
-                                addRow('Sigma CT', () => parseFloat(data.sigmaCt)),
-                                addRow('Sigma D', () => parseFloat(resultados.sigmaD)),
-                                addRow('AW', (res, zone) => parseFloat(res.resultsAW[zone])),
-                                addRow('SM', (res, zone) => parseFloat(res.SM[zone])),
-                                addRow('SM,I', (res, zone) => parseFloat(res.SM[zone])) // Asumiendo SM,I es similar a SM
+                                ...addRow('Tau', '', () => parseFloat(data.tau)),
+                                ...addRow('Tau D', ' MPa', () => parseFloat(resultados.tauD)),
+                                ...addRow('Sigma CT', ' MPa', () => parseFloat(data.sigmaCt)),
+                                ...addRow('Sigma D', ' MPa', () => parseFloat(resultados.sigmaD)),
+                                ...addRow('AW', '', (res, zone) => parseFloat(res.resultsAW[zone])),
+                                ...addRow('SM', ' mm³', (res, zone) => parseFloat(res.SM[zone])),
+                                ...addRow('SM,I', ' mm³', (res, zone) => parseFloat(res.SM[zone])) // Asumiendo SM,I es similar a SM
                             ];
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Propiedad', 'Valor', 'Unidad']];
                             platingStiffenersBody = [
-                                ['Tau', formatValue(data.tau)],
-                                ['Tau D', formatValue(resultados.tauD)],
-                                ['Sigma CT', formatValue(data.sigmaCt)],
-                                ['Sigma D', formatValue(resultados.sigmaD)],
-                                ['AW', formatValue(resultados.AW)],
-                                ['SM', formatValue(resultados.SM)],
-                                ['I', formatValue(resultados.I)] // Asumiendo SM,I es similar a SM
+                                ['Tau', data.tau.toFixed(5), ''],
+                                ['Tau D', resultados.tauD.toFixed(5), 'MPa'],
+                                ['Sigma CT', data.sigmaCt.toFixed(5), 'MPa'],
+                                ['Sigma D', resultados.sigmaD.toFixed(5), 'MPa'],
+                                ['AW', resultados.AW.toFixed(5), ''],
+                                ['SM', resultados.SM.toFixed(5), 'mm³'],
+                                ['I', resultados.I.toFixed(5), 'mm⁴'] // Asumiendo SM,I es similar a SM
                             ];
                         }
-                        break;
+                        break;                        
                 }
                 
             }
-            
+
+            function filterAcronyms() {
+                var acronymsToShow = [];
+                var analysisType = data.analysisType;
+                var material = data.material;
+                var samplingZone = data.samplingZone;
+                
+                if (samplingZone === 'Fondo') {
+                    acronymsToShow = ['Kar', 'Kl', 'Kdc'];
+                } else if (samplingZone === 'Costados y Espejo') {
+                    acronymsToShow = ['Kz', 'Kar', 'Kl', 'Kdc'];
+                } else if (samplingZone === 'Cubierta') {
+                    acronymsToShow = ['Kar', 'Kdc', 'Kl'];
+                } else if (samplingZone === 'Superestructura') {
+                    acronymsToShow = ['Kar', 'Kdc', 'Ksup'];
+                } else if (samplingZone === 'Mamparos estancos' || samplingZone === 'Mamparos de tanques integrales' || samplingZone === 'Mamparos de colisión') {
+                    acronymsToShow = ['Hb'];
+                } 
+                
+                
+                if (analysisType === 'Plating') {
+                    if (material === 'Acero' || material === 'Aluminio') {
+                    acronymsToShow.push('b', 'l', 'k2', 'x', 'c', 'kc', 'Sigma u', 'sigma y', 'sigma d', 'T final');
+                    } else if (material === 'Madera (laminada y plywood)') {
+                    acronymsToShow.push('b', 'l', 'k2', 'x', 'sigma uf', 'sigma d', 'T final');
+                    } else if (material === 'Fibra laminada') {
+                    acronymsToShow.push('b', 'l', 'k2', 'x', 'c', 'kc', 'sigma uf', 'sigma d', 'T final');
+                    } else if (material === 'Fibra con nucleo (Sandwich)') {
+                    acronymsToShow.push('b', 'l', 'k2', 'x', 'c', 'kc', 'sigma ut', 'sigma uc', 'eio', 'tau', 'k3', 'k1', 'T final', 'sigma dt', 'sigma dc', 'tau d', 'sm inner', 'sm outter', 'second I', 'wos', 'wis');
+                    }
+                }
+                
+                if (analysisType === 'Stiffeners') {
+                    acronymsToShow.push('s', 'cu', 'ksa', 'lu', 'x');
+                    if (material === 'Acero' || material === 'Aluminio') {
+                    acronymsToShow.push('sigma y', 'sigma d', 'tau d', 'AW', 'SM');
+                    } else if (material === 'Madera (laminada y plywood)') {
+                    acronymsToShow.push('tau', 'tau d', 'sigma uf', 'sigma d', 'AW', 'sm');
+                    } else if (material === 'Fibra laminada') {
+                    acronymsToShow.push('tau', 'tau d', 'sigma ct', 'sigma d', 'AW', 'sm', 'I');
+                    }
+                }
+                
+                return acronymsToShow;
+                }
+
+            var acronymsToShow = filterAcronyms();
+            var filteredData = dataAcron.filter(item => acronymsToShow.includes(item.acronym));
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(12);  
             doc.setTextColor(85, 115, 89);
 
+
             doc.text(`Embarcación: ${generalData.shipName || ''}`, 14, 28);
             doc.text(`Realizado por: ${generalData.doneBy || ''}`, 14, 34);
             doc.text(`Fecha: ${generalData.date || ''}`, 14, 40);
+
 
             doc.text("Información General", 14, 56);
             doc.autoTable({
@@ -1631,8 +1708,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     cellPadding: 1, 
                 }
             });
-    
+
             let currentY = doc.lastAutoTable.finalY + 8;
+
+            doc.text("Información Especifica", 14, currentY);
+            doc.autoTable({
+                head: [['Acrónimo', 'Descripción']],
+                body: filteredData.map(item => [item.acronym, item.label]),
+                startY: currentY + 4,
+                headStyles: {
+                    fillColor: [85, 115, 89]  
+                }, styles: {
+                    cellPadding: 1, 
+                },
+                margin: { bottom: 30, top: 30 }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 8;
     
             // Agregar la tabla de presión al PDF
             doc.text("Presión", 14, currentY);
@@ -1650,6 +1742,10 @@ document.addEventListener('DOMContentLoaded', function () {
     
             currentY = doc.lastAutoTable.finalY + 8;
     
+            // Determinar el ancho de la columna de ubicación basado en el número total de columnas
+            let totalColumns = platingStiffenersHead[0].length;
+            let locationColumnWidth = totalColumns > 5 ? 40 : 30; // Aumentar el ancho si hay muchas columnas
+
             // Agregar la tabla de plating o stiffeners
             doc.text(data.analysisType === 'Plating' ? "Plating" : "Stiffeners", 14, currentY);
             currentY += 3;
@@ -1658,15 +1754,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: platingStiffenersBody,
                 startY: currentY,
                 headStyles: {
-                    fillColor: [85, 115, 89]  // Color verde oscuro para el encabezado
-                }, styles: {
+                    fillColor: [85, 115, 89] // Color verde oscuro para el encabezado
+                },
+                styles: {
                     cellPadding: 1, 
                 },
                 columnStyles: {
-                    0: { cellWidth: 30 }  // Ajusta según sea necesario
+                    0: { cellWidth: locationColumnWidth } // Usa la variable para el ancho
                 },
-                margin: { bottom: 30, top: 30 }  // Ajusta el margen inferior a 35
+                margin: { bottom: 30, top: 30 } // Ajusta el margen inferior a 35
             });
+
             doc.addImage(imageUrl, 'JPEG', 0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height);
     
             // Guardar el PDF
@@ -1723,7 +1821,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const allTempData = JSON.parse(localStorage.getItem('temporaryFormData')) || {};
         data = allTempData[calculationId];
         let formFields = ``;
-        const waterColumnHeightZones = ['Mamparos de colisión', 'Mamparos de tanques integrales', 'Mamparos estancos', 'Placas anti oleaje'];
+        const waterColumnHeightZones = ['Mamparos de colisión', 'Mamparos de tanques integrales', 'Mamparos estancos'];
 
     let resultFields = `
         <div style="margin-top: 5px">
@@ -2073,28 +2171,6 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         }
         
-        if (zonaEscantillonado === 'Placas anti oleaje') {
-            additionalFields += `
-                <div class="form-group row align-items-center">
-                    <label for="alturaMamparo" class="col-sm-9 col-form-label">Ingrese la altura del mamparo de tanque integral (metros):</label>
-                    <div class="col-sm-3">
-                        <input type="number" class="form-control" id="alturaMamparo" name="alturaMamparo" value="${data.hM || 0}">
-                    </div>
-                </div>
-                <div class="form-group row align-items-center">
-                    <label for="baseMamparo" class="col-sm-9 col-form-label">Ingrese la base del mamparo de tanque integral (metros):</label>
-                    <div class="col-sm-3">
-                        <input type="number" class="form-control" id="baseMamparo" name="baseMamparo" value="${data.bM || 0}">
-                    </div>
-                </div>
-                <div class="form-group row align-items-center">
-                    <label for="perforationArea" class="col-sm-9 col-form-label">Ingrese el área de perforación de la placa anti oleaje (m²):</label>
-                    <div class="col-sm-3">
-                        <input type="number" class="form-control" id="perforationArea" name="perforationArea" value="${data.pA || 0}">
-                    </div>
-                </div>
-            `;
-        }
         
         formFields += additionalFields;
         
@@ -2180,9 +2256,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const z = parseFloat(document.getElementById('deckHeight')?.value) || 0;
         const hp = parseFloat(document.getElementById('panelCenterHeight')?.value) || 0;
         const hB = parseFloat(document.getElementById('columnHeight')?.value) || 0;
-        const hM = parseFloat(document.getElementById('alturaMamparo')?.value) || 0;
-        const bM = parseFloat(document.getElementById('baseMamparo')?.value) || 0;
-        const pA = parseFloat(document.getElementById('perforationArea')?.value) || 0;
         const hs = parseFloat(document.getElementById('stiffenerCenterHeight')?.value) || 0;
         const etc = parseFloat(document.getElementById('modulusEtc')?.value) || 0;
         const tau = parseFloat(document.getElementById('tau')?.value) || 0;
@@ -2201,7 +2274,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tFinalDisplay = document.getElementById('tFinalDisplay');
         const wMinDisplay = document.getElementById('wMinDisplay'); 
 
-        const craft = { designCategory, analysisType, samplingZone, material, BC, B04, mLDC, LH, V, BWL, LWL, b, l, x, c, z, hp, hB, hM, bM, pA, hs, etc, tau, s, lu, cu, sigmaCt, sigmaUf, sigmaU, sigmaY, sigmaUt, sigmaUc, eio, tauU, fiberType, exteriorFiberType, interiorFiberType, sandwichCoreType };
+        const craft = { designCategory, analysisType, samplingZone, material, BC, B04, mLDC, LH, V, BWL, LWL, b, l, x, c, z, hp, hB, hs, etc, tau, s, lu, cu, sigmaCt, sigmaUf, sigmaU, sigmaY, sigmaUt, sigmaUc, eio, tauU, fiberType, exteriorFiberType, interiorFiberType, sandwichCoreType };
         let minThickness, woodT, metalT, w_min, ar, k2, pressure, tFinalValue, resultados;
         let resultadosPlating = {};
         let resultadosStifeners = {};
@@ -2445,7 +2518,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             }; 
                         } updateSuperstructureResultsSandwich(results);
                     }
-                    //marcador
 
                     
                     //tFinalValue = tFinal && typeof tFinal === 'object' && tFinal.thickness !== undefined ? tFinal.thickness : tFinal;
@@ -2469,7 +2541,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                     } else if (craft.material === 'Madera (laminada y plywood)') {
                         resultadosPlating = woodPlating(b, sigmaUf, k2, pressure); 
-                        woodT = resultadosPlating.thickness;
+                        tFinal = resultadosPlating.thickness;
                          
                     } else {
                         b = Math.min(b, 330 * craft.LH);
@@ -2522,44 +2594,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                     }
  
-                    tFinalValue = tFinal && typeof tFinal === 'object' && tFinal.thickness !== undefined ? tFinal.thickness : tFinal;
-                    tFinalDisplay.value = tFinalValue ? Number(tFinalValue).toFixed(4) : '0';
-
-                    break;
-
-                case 'Placas anti oleaje':
-                    resultados = washPlatesPressure(craft);
-                    pressure = resultados.Pressure;
-        
-
-                    if (material === 'Fibra laminada') {
-                        resultadosPlating = FRPSingleSkinPlating(b, sigmaUf, c, k2, pressure);
-                        tFinal = resultadosPlating.thickness;
-                        
-                    } else if (material === 'Acero' || material === 'Aluminio') {
-                        
-                        resultadosPlating = metalPlating(b, sigmaU, sigmaY, c, k2, pressure)
-                        tFinal = resultadosPlating.thickness;
-                    
-                        
-                    } else if (craft.material === 'Madera (laminada y plywood)') {
-                        resultadosPlating = woodPlating(b, sigmaUf, k2, pressure); 
-                        woodT = resultadosPlating.thickness;
-                        
-                    } else {
-                        b = Math.min(b, 330 * craft.LH);
-                        k3 = Math.min(Math.max((0.027 * (ar ** 2) - 0.029 * ar + 0.011) / ((ar ** 2) - 1.463 * ar + 1.108), 0.014), 0.028);
-
-                        const results = FRP_sandwich_plating(b, ar, c, sigmaUt, sigmaUc, eio, tauU, k2, k3, pressure, craft);
-                        tFinal = results.thickness;
-                        resultadosPlating = results; 
-                        
-                        document.getElementById('SMInnerDisplay').value = results.SM_inner.toExponential(4);
-                        document.getElementById('SMOuterDisplay').value = results.SM_outter.toExponential(4);
-                        document.getElementById('SecondIDisplay').value = results.second_I.toExponential(4);                        
-                        
-                    }
-
                     tFinalValue = tFinal && typeof tFinal === 'object' && tFinal.thickness !== undefined ? tFinal.thickness : tFinal;
                     tFinalDisplay.value = tFinalValue ? Number(tFinalValue).toFixed(4) : '0';
 
@@ -2619,7 +2653,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 case 'Superestructura':
                     resultados = superstructuresDeckhousesPressure(craft);
-                    pressure = resultados.Pressure;
+                    pressure = resultados.PSUP_M_values;
                     break;
 
                 case 'Mamparos estancos':
@@ -2632,11 +2666,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     resultados = {Pressure: pressure, hB}
                     break;
                     
-                case 'Placas anti oleaje':
-                    resultados = washPlatesPressure(craft);
-                    pressure = resultados.Pressure;
-                    break;
-
                 case 'Mamparos de colisión':
                     pressure = collisionBulkheadsPressure(hB);
                     resultados = {Pressure: pressure, hB}
@@ -2662,6 +2691,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tau_d = craft.material === 'Acero' ? 0.45 * sigmaY : 0.4 * sigmaY;
                     sigma_d = craft.material === 'Acero' ? 0.8 * sigmaY : 0.7 * sigmaY;
                 
+                    console.log("presion: ",pressure)
                     resultadosStifeners = web_area_AW(pressure, s, lu, tau_d,craft);
                     AW = resultadosStifeners.AW;
                     SM = min_section_modulus_SM(pressure, s, lu, cu, sigma_d,craft);
@@ -2697,6 +2727,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Suponiendo que resultadosPlating y resultadosStifeners son inicialmente objetos/diccionarios
         let resultadosFinales = Object.keys(resultadosPlating).length > 0 ? resultadosPlating : resultadosStifeners;
         resultadosFinales.pressure = resultados;
+        console.log(calculationId)
         saveTempFormData(calculationId, resultadosFinales)
     }
 
@@ -2708,9 +2739,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const zInput = document.getElementById('deckHeight');
         const hpInput = document.getElementById('panelCenterHeight');
         const hBInput = document.getElementById('columnHeight');
-        const hMInput = document.getElementById('alturaMamparo');
-        const bMnput = document.getElementById('baseMamparo');
-        const pAinput = document.getElementById('perforationArea');
         const hsinput = document.getElementById('stiffenerCenterHeight');
         const etcInput = document.getElementById('modulusEtc');
         const tauInput = document.getElementById('tau');
@@ -2733,9 +2761,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (zInput) zInput.addEventListener('input', calculateAndUpdateTfinal);  
         if (hpInput) hpInput.addEventListener('input', calculateAndUpdateTfinal);
         if (hBInput) hBInput.addEventListener('input', calculateAndUpdateTfinal);
-        if (hMInput) hMInput.addEventListener('input', calculateAndUpdateTfinal);
-        if (bMnput) bMnput.addEventListener('input', calculateAndUpdateTfinal);
-        if (pAinput) pAinput.addEventListener('input', calculateAndUpdateTfinal);
         if (hsinput) hsinput.addEventListener('input', calculateAndUpdateTfinal);
         if (etcInput) etcInput.addEventListener('input', calculateAndUpdateTfinal);
         if (tauInput) tauInput.addEventListener('input', calculateAndUpdateTfinal);

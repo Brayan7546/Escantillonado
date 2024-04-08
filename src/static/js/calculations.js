@@ -62,6 +62,8 @@ function areaPressureReductionKAR(craft) {
     } else { // 'Stiffeners'
         AD = Math.max((craft.lu * craft.s) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
     }
+
+    console.log(AD)
     let kR = craft.analysisType === 'Plating' ? 1.5 - 3e-4 * craft.b : 1 - 2e-4 * craft.lu;
     kR = Math.max(kR, 1.0);
     let kAR = (kR * 0.1 * (craft.mLDC ** 0.15)) / (AD ** 0.3);
@@ -240,8 +242,9 @@ function areaPressureReductionKAR(craft) {
     if (craft.analysisType === 'Plating') {
         AD = Math.min((craft.l * craft.b) * 1e-6, 2.5 * (craft.b ** 2) * 1e-6);
     } else {
-        AD = Math.max((craft.s) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
-    }
+        AD = Math.max((craft.s * craft.lu) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
+    } 
+    console.log(AD)
 
     let kR = craft.analysisType === 'Plating' ? 1.5 - 3e-4 * craft.b : 1 - 2e-4 * craft.lu;
     kR = Math.max(kR, 1.0);
@@ -388,24 +391,6 @@ function integralTankBulkheadsPressure(hB){
     return Pressure
 }
     
-function washPlatesPressure(craft) {
-    const areaMamparoTanque = craft.hM * craft.bM;
-
-    if (craft.pA < 0.5 * areaMamparoTanque) {
-        alert("El área de perforación debe ser mayor al 50% del área total del mamparo de tanque integral.");
-        return; // Salir de la función si la validación falla
-    }
-
-    const factorReduccion = (areaMamparoTanque - craft.pA) / areaMamparoTanque;
-
-    const PWP = 10 * craft.hB * factorReduccion;
-    
-    Pressure = PWP;
-    
-
-    return {hM:craft.hM, bM:craft.bM, Pressure, areaMamparoTanque, areaPerforacion: craft.pA, factorReduccion};
-}
-
 function collisionBulkheadsPressure(hB){
     PTB = 10 * hB
     Pressure = PTB;
@@ -413,16 +398,14 @@ function collisionBulkheadsPressure(hB){
 }
 
 function web_area_AW(pressure, s, lu, tau_d, craft) {
-    const waterColumnHeightZones = ['Mamparos de colisión', 'Mamparos de tanques integrales', 'Mamparos estancos', 'Placas anti oleaje'];
+    const waterColumnHeightZones = ['Mamparos de colisión', 'Mamparos de tanques integrales', 'Mamparos estancos'];
     const kSA = waterColumnHeightZones.includes(craft.samplingZone) ? 7.5 : 5;
     const kSUP_values = superstructureDeckhousePressureReductionKSUP();
-    const PDM_BASE = 0.35 * craft.LWL + 14.6
 
     if (craft.samplingZone === 'Superestructura') {
         let resultsAW = {};
         for (const [location, kSUP] of Object.entries(kSUP_values)) {
-            const pres = Math.max(PDM_BASE * kSUP, 5);
-            resultsAW[location] = (kSA * pres * s * lu / tau_d) * 1e-6;
+            resultsAW[location] = (kSA * pressure[location] * s * lu / tau_d) * 1e-6;
         }
         return {resultsAW, kSA};;
     } else {
