@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block customCSS %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
+{% endblock %}
+
+{% block body %}
+<nav class="navbar custom-navbar fixed-top">
+    <div class="container-fluid d-flex justify-content-between" id="navcontainer">
+        <a class="navbar-brand" href="#" data-bs-toggle="modal" data-bs-target="#confirmModal">
+            <img id="logo" src="{{ url_for('static', filename='img/Logotipo Mod.png')}}" height="60px" class="d-inline-block align-text-center" alt="Logo"> 
+        </a>
+
+        <button style="color: white; font-size: 16px;" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+          Menú de ayuda
+          <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="white" class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+          </svg>
+        </button>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style="width: 280px;">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Ayudas u opciones</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link" >ISO 12215-5</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Definiciones y Acrónimos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Manual de usuario</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endblock %}
