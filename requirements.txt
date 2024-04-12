@@ -1,7 +1,6 @@
 Flask==1.1.4
 Flask-Cors==4.0.0
 Flask-Uploads==0.2.1
-Flask-Bootstrap
 gunicorn==21.2.0
 Bootstrap-Flask==2.3.3
 python-dateutil==2.8.2
