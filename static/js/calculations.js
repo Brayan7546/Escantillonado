@@ -63,7 +63,6 @@ function areaPressureReductionKAR(craft) {
         AD = Math.max((craft.lu * craft.s) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
     }
 
-    console.log(AD)
     let kR = craft.analysisType === 'Plating' ? 1.5 - 3e-4 * craft.b : 1 - 2e-4 * craft.lu;
     kR = Math.max(kR, 1.0);
     let kAR = (kR * 0.1 * (craft.mLDC ** 0.15)) / (AD ** 0.3);
