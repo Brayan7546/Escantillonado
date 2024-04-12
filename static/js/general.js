@@ -1152,24 +1152,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectRow(this);
             }
         });
-
-        document.getElementById('calculationForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Previene el envío del formulario
-
-            // Asumimos que tienes una manera de obtener el correo del usuario actual
-            const userEmail = "user@example.com"; // Deberías reemplazar esto por la lógica adecuada para obtener el correo del usuario actual
-
-            const calculationId = currentCalculationRow.cells[1].textContent;
-
-            //let userCalculations = allCalculations[userEmail] || [];
-
-            //userCalculations.push({ id: calculationId, data: formData });
-
-            //allCalculations[userEmail] = userCalculations;
-
-            //localStorage.setItem('temporaryFormData', JSON.stringify(temporaryFormData));
-
-        });
     });
 
     document.addEventListener('click', function(e) {
