@@ -965,10 +965,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     interactionSuffix = ' ECAS.png';
                     break;
                 case 'waterlineLength':
-                    interactionSuffix = ' EFLOT.PNG';
+                    interactionSuffix = ' EFLOT.png';
                     break;
                 case 'waterlineBeam':
-                    interactionSuffix = ' MANFLOT.PNG';
+                    interactionSuffix = ' MANFLOT.png';
                     break;
             }
     
