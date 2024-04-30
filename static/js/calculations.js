@@ -212,9 +212,9 @@ function FRP_sandwich_plating(b, ar, c, sigma_ut, sigma_uc, Eio, tau_u, k2, k3, 
     return { k1,k2,k3,KC, kSHC, sigma_dt, sigma_dc, tau_d, SM_inner, SM_outter, second_I, thickness };
 }
 
-function sideTransomPressure(craft) {
+function sideTransomPressure(craft, h) {
     
-    const kZ = hullSidePressureReductionKZ(craft.z, craft.hp);
+    const kZ = hullSidePressureReductionKZ(craft.z, h);
     const kAR = areaPressureReductionKAR(craft);
     const kL = longitudinalPressureDistributionKL(craft);
     const kDC = designCategoryKDC(craft);

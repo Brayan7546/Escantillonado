@@ -72,6 +72,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     function generatePDF(selectedIds) {
+        const shipName = document.getElementById('shipName').value;
+        const doneBy = document.getElementById('doneBy').value;
+        const date = document.getElementById('date').value;
+    
+        if (!shipName || !doneBy || !date) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se puede exportar porque no se han diligenciado los campos de "Embarcación", "Realizado por" y/o "Fecha".',
+                icon: 'error',
+            });
+            return;
+        }
+
         const generalData = JSON.parse(localStorage.getItem('generalData'));
         const tempFormData = JSON.parse(localStorage.getItem('temporaryFormData')) || {};
 
@@ -249,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Acron', 'Valor']];
                             platingStiffenersBody = [
                                 ['b (mm)', data.b],
                                 ['l (mm)', data.l],
@@ -534,17 +547,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     fillColor: [85, 115, 89]  // RGB equivalent of #557359
                 }, styles: {
                     cellPadding: 1, 
-                }
+                },
+                margin: { bottom: 30, top: 30 } 
             });
     
             currentY = doc.lastAutoTable.finalY + 8;
-    
+            if (currentY > (doc.internal.pageSize.height - 30)) {
+                doc.addPage();
+                currentY = 30; // Reinicia la posición en Y al inicio de la nueva página
+            }
+
+
             // Determinar el ancho de la columna de ubicación basado en el número total de columnas
             let totalColumns = platingStiffenersHead[0].length;
             let locationColumnWidth = totalColumns > 5 ? 40 : 30; // Aumentar el ancho si hay muchas columnas
 
             // Agregar la tabla de plating o stiffeners
-            doc.text(data.analysisType === 'Plating' ? "Plating" : "Stiffeners", 14, currentY);
+            doc.text(data.analysisType === 'Plating' ? "Resultados para Chapado" : "Resultados para Refuerzo", 14, currentY);
             currentY += 3;
             doc.autoTable({
                 head: platingStiffenersHead,
@@ -568,7 +587,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
         doc.save('informe.pdf');
     }
-    
 
     function saveGeneralData() {
         const generalData = {
@@ -819,11 +837,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         </select>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="analysisType" >Tipo de análisis:</label>
+                        <label for="analysisType">Tipo de análisis:</label>
                         <select class="form-control" id="analysisType">
                             <option>Seleccione una opción</option>
-                            <option>Plating</option>
-                            <option>Stiffeners</option>
+                            <!-- Aunque el usuario ve "Chapado", el valor enviado sigue siendo "Plating" -->
+                            <option value="Plating">Chapado</option>
+                            <!-- Aunque el usuario ve "Refuerzo", el valor enviado sigue siendo "Stiffeners" -->
+                            <option value="Stiffeners">Refuerzo</option>
                         </select>
                     </div>
                     <!-- Campos de número con etiquetas -->
@@ -1017,8 +1037,15 @@ document.addEventListener('DOMContentLoaded', function () {
         updateFiberTypeVisibility();
     
         function updateCalculationName() {
+            // Diccionario para traducir los tipos de análisis
+            const analysisTypeTranslations = {
+                'Plating': 'Chapado',
+                'Stiffeners': 'Refuerzo'
+            };
+
             // Obtén los valores actuales para construir el nuevo ID
-            const analysisType = analysisTypeSelect.value !== 'Seleccione una opción' ? analysisTypeSelect.value : '';
+            const analysisTypeRaw = analysisTypeSelect.value !== 'Seleccione una opción' ? analysisTypeSelect.value : '';
+            const analysisType = analysisTypeTranslations[analysisTypeRaw] || analysisTypeRaw;
             const samplingZone = samplingZoneSelect.value !== 'Seleccione una opción' ? samplingZoneSelect.value : '';
             const material = materialSelect.value !== 'Seleccione una opción' ? materialSelect.value : '';
             let baseCalculationName = `${analysisType} ${samplingZone} (${material})`;
@@ -1233,8 +1260,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-    
-    
 
     function loadSecondForm() {
         const analysisType = document.getElementById('analysisType').value;
@@ -1279,6 +1304,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const downloadButton = document.getElementById('DownloadPdfButton');
         if (downloadButton) {
             downloadButton.addEventListener('click', function() {
+                const shipName = document.getElementById('shipName').value;
+                const doneBy = document.getElementById('doneBy').value;
+                const date = document.getElementById('date').value;
+            
+                if (!shipName || !doneBy || !date) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se puede exportar porque no se han diligenciado los campos de "Embarcación", "Realizado por" y/o "Fecha".',
+                        icon: 'error',
+                    });
+                    return;
+                }
+
                 const tempFormData = JSON.parse(localStorage.getItem('temporaryFormData')) || {};
                 const generalData = JSON.parse(localStorage.getItem('generalData')) || {};
                 const calculationId = currentCalculationRow.cells[1].textContent;
@@ -1290,8 +1328,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 let missingDataMessage = '';
             
                 if (
-                    data.resultados === null ||
                     typeof data.resultados === 'undefined' ||
+                    data.resultados === null ||
                     Object.keys(data.resultados).length === 0
                 ) {
                     allDataAvailable = false;
@@ -1400,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         
                         } else {
-                            platingStiffenersHead = [['Property', 'Value']];
+                            platingStiffenersHead = [['Acrónimo', 'Valor']];
                             platingStiffenersBody = [
                                 ['b (mm)', data.b],
                                 ['l (mm)', data.l],
@@ -1773,17 +1811,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     fillColor: [85, 115, 89]  // RGB equivalent of #557359
                 }, styles: {
                     cellPadding: 1, 
-                }
+                } ,
+                margin: { bottom: 30, top: 30 } 
             });
     
             currentY = doc.lastAutoTable.finalY + 8;
+
+            if (currentY > (doc.internal.pageSize.height - 30)) {
+                doc.addPage();
+                currentY = 30; // Reinicia la posición en Y al inicio de la nueva página
+            }
+
     
             // Determinar el ancho de la columna de ubicación basado en el número total de columnas
             let totalColumns = platingStiffenersHead[0].length;
             let locationColumnWidth = totalColumns > 5 ? 40 : 30; // Aumentar el ancho si hay muchas columnas
 
             // Agregar la tabla de plating o stiffeners
-            doc.text(data.analysisType === 'Plating' ? "Plating" : "Stiffeners", 14, currentY);
+            doc.text(data.analysisType === 'Plating' ? "Resultados para Chapado" : "Resultados para Refuerzo", 14, currentY);
             currentY += 3;
             doc.autoTable({
                 head: platingStiffenersHead,
@@ -2388,7 +2433,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
 
                 case 'Costados y Espejo':
-                    resultados = sideTransomPressure(craft);
+                    resultados = sideTransomPressure(craft, hp);
                     pressure = resultados.Pressure
         
                     if (material === 'Fibra laminada') {
@@ -2682,7 +2727,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
                     
                 case 'Costados y Espejo':
-                    resultados = sideTransomPressure(craft);
+                    resultados = sideTransomPressure(craft, hs);
                     pressure = resultados.Pressure;
                     break;
 
