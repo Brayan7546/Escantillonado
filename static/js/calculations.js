@@ -1,5 +1,6 @@
 
-function bottomPressure(craft) {
+function bottomPressure(craft, analysisType) {
+    craft.analysisType = analysisType;
     const kAR = areaPressureReductionKAR(craft);
 
     const kL = longitudinalPressureDistributionKL(craft);
@@ -55,22 +56,6 @@ function dynamicLoadNCG(craft) {
     return nCG;
 }
 
-function areaPressureReductionKAR(craft) {
-    let AD;
-    if (craft.analysisType === 'Plating') {
-        AD = Math.min((craft.l * craft.b) * 1e-6, 2.5 * (craft.b ** 2) * 1e-6);
-    } else { // 'Stiffeners'
-        AD = Math.max((craft.lu * craft.s) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
-    }
-
-    let kR = craft.analysisType === 'Plating' ? 1.5 - 3e-4 * craft.b : 1 - 2e-4 * craft.lu;
-    kR = Math.max(kR, 1.0);
-    let kAR = (kR * 0.1 * (craft.mLDC ** 0.15)) / (AD ** 0.3);
-    kAR = Math.min(kAR, 1);
-    const minKAR = craft.material === 'Fibra con nucleo (Sandwich)' ? 0.4 : 0.25;
-    kAR = Math.max(minKAR, kAR);
-    return kAR;
-}
 
 function designCategoryKDC(craft) {
     let kDC;
@@ -154,6 +139,7 @@ function minBottomThickness(craft, sigmaY, sigmaUf) {
 }
 
 function metalPlating(b, sigmaU, sigmaY, c, k2, pressure) {
+    console.log("k2", k2)
     const sigmaD = Math.min(0.6 * sigmaU, 0.9 * sigmaY);
     const kC = curvatureCorrectionKC(b, c); // Asegúrate de que esta función esté definida
     const thickness = b * kC * Math.sqrt((pressure * k2) / (1000 * sigmaD));
@@ -212,8 +198,8 @@ function FRP_sandwich_plating(b, ar, c, sigma_ut, sigma_uc, Eio, tau_u, k2, k3, 
     return { k1,k2,k3,KC, kSHC, sigma_dt, sigma_dc, tau_d, SM_inner, SM_outter, second_I, thickness };
 }
 
-function sideTransomPressure(craft, h) {
-    
+function sideTransomPressure(craft, analysisType, h) {
+    craft.analysisType = analysisType;
     const kZ = hullSidePressureReductionKZ(craft.z, h);
     const kAR = areaPressureReductionKAR(craft);
     const kL = longitudinalPressureDistributionKL(craft);
@@ -238,12 +224,12 @@ function sideTransomPressure(craft, h) {
 
 function areaPressureReductionKAR(craft) {
     let AD;
+
     if (craft.analysisType === 'Plating') {
         AD = Math.min((craft.l * craft.b) * 1e-6, 2.5 * (craft.b ** 2) * 1e-6);
     } else {
         AD = Math.max((craft.s * craft.lu) * 1e-6, 0.33 * (craft.lu ** 2) * 1e-6);
     } 
-    console.log(AD)
 
     let kR = craft.analysisType === 'Plating' ? 1.5 - 3e-4 * craft.b : 1 - 2e-4 * craft.lu;
     kR = Math.max(kR, 1.0);
@@ -256,6 +242,7 @@ function areaPressureReductionKAR(craft) {
 
     return kAR;
 }
+
 
 function hullSidePressureReductionKZ(Z, h) {
     return (Z - h) / Z;
@@ -294,7 +281,8 @@ function minSideTransomThickness( craft, sigmaY, sigmaUf) {
     return tMin;
 }
 
-function deckPressure(craft) {
+function deckPressure(craft, analysisType) {
+    craft.analysisType = analysisType;
     let kAR = areaPressureReductionKAR(craft);
     let kDC = designCategoryKDC(craft);
     let kL = longitudinalPressureDistributionKL(craft);
@@ -348,7 +336,8 @@ function minDeckThickness(craft) {
     return t;
 }
 
-function superstructuresDeckhousesPressure(craft) {
+function superstructuresDeckhousesPressure(craft, analysisType) {
+    craft.analysisType = analysisType;
     const kAR = areaPressureReductionKAR(craft); 
     const kDC = designCategoryKDC(craft); 
     const kSUP_values = superstructureDeckhousePressureReductionKSUP(); 
